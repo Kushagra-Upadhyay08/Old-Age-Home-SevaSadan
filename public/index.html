@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shantilal Mohanlal Ashaktashram Society - Admission Form</title>
+  <!-- Google Fonts for Editorial look: EB Garamond (Serif Display) and Inter (Sans body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <div class="nav-container">
+      <div class="brand">
+        <!-- Anthropic-style Radial Spike SVG -->
+        <svg class="brand-spike" viewBox="0 0 24 24" width="20" height="20">
+          <path fill="currentColor" d="M12 2v20M2 12h20M5 5l14 14M5 19L19 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="brand-text display-lang-en">Ashaktashram Dakor</span>
+        <span class="brand-text display-lang-gu" style="display: none;">અશક્તાશ્રમ ડાકોર</span>
+      </div>
+      <div class="nav-controls">
+        <button id="lang-switch-btn" class="button-secondary">ગુજરાતી</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Header -->
+  <header class="hero-band">
+    <div class="hero-content">
+      <h1 class="display-lang-en">Shantilal Mohanlal Ashaktashram Society</h1>
+      <h1 class="display-lang-gu" style="display: none;">શાંતિલાલ મોહનલાલ અશક્તાશ્રમ સોસાયટી</h1>
+      
+      <p class="subtitle display-lang-en">Admission Application Form | Dakor - 388225</p>
+      <p class="subtitle display-lang-gu" style="display: none;">પ્રવેશ અરજી ફોર્મ | ડાકોર - 388225</p>
+      
+      <div class="badge-row">
+        <span class="badge-coral">BETA</span>
+        <span class="badge-pill display-lang-en">Official Admission Portal</span>
+        <span class="badge-pill display-lang-gu" style="display: none;">સત્તાવાર પ્રવેશ પોર્ટલ</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    <div class="grid-layout">
+      
+      <!-- Left Column: Form -->
+      <div class="form-column">
+        <form id="admission-form" novalidate>
+          
+          <!-- Application Header Card -->
+          <div class="form-card">
+            <div class="card-header">
+              <h2 class="display-lang-en">Application General Info</h2>
+              <h2 class="display-lang-gu" style="display: none;">સામાન્ય વિગત</h2>
+            </div>
+            <div class="form-row-3">
+              <div class="form-group">
+                <label class="display-lang-en">Application Number</label>
+                <label class="display-lang-gu" style="display: none;">અરજી નંબર</label>
+                <input type="text" name="application_number" placeholder="Auto-generated" readonly class="text-input">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Date</label>
+                <label class="display-lang-gu" style="display: none;">તારીખ</label>
+                <input type="date" name="application_date" class="text-input" required id="field-date">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Room Number (Pref)</label>
+                <label class="display-lang-gu" style="display: none;">રૂમ નંબર</label>
+                <input type="text" name="room_number" class="text-input" placeholder="e.g. 102">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 1: Applicant Details -->
+          <div class="form-card">
+            <div class="card-header border-coral">
+              <h2 class="display-lang-en">1. Details of the Applicant</h2>
+              <h2 class="display-lang-gu" style="display: none;">૧. અરજદારે ભરવાની વિગતો</h2>
+            </div>
+            
+            <div class="form-group">
+              <label class="required display-lang-en">Applicant's Full Name</label>
+              <label class="required display-lang-gu" style="display: none;">અરજદારનું પુરું નામ</label>
+              <input type="text" name="full_name" class="text-input" required placeholder="Enter full name">
+              <div class="error-msg" id="err-full_name"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="required display-lang-en">Applicant's Address</label>
+              <label class="required display-lang-gu" style="display: none;">અરજદારનું સરનામું</label>
+              <textarea name="address" class="text-input textarea-field" required placeholder="Enter full residential address"></textarea>
+              <div class="error-msg" id="err-address"></div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="required display-lang-en">Telephone - Home</label>
+                <label class="required display-lang-gu" style="display: none;">ટેલીફોન નંબર (ઘર)</label>
+                <input type="tel" name="phone_home" class="text-input" required placeholder="e.g. 02699XXXX">
+                <div class="error-msg" id="err-phone_home"></div>
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Telephone - Office</label>
+                <label class="display-lang-gu" style="display: none;">ટેલીફોન નંબર (ઓફિસ)</label>
+                <input type="tel" name="phone_office" class="text-input" placeholder="e.g. 02699XXXX">
+              </div>
+            </div>
+
+            <div class="form-row-3">
+              <div class="form-group">
+                <label class="required display-lang-en">Age</label>
+                <label class="required display-lang-gu" style="display: none;">ઉંમર</label>
+                <input type="number" name="age" class="text-input" required min="1" max="120" placeholder="e.g. 65">
+                <div class="error-msg" id="err-age"></div>
+              </div>
+              <div class="form-group">
+                <label class="required display-lang-en">Date of Birth</label>
+                <label class="required display-lang-gu" style="display: none;">જન્મ તારીખ</label>
+                <input type="date" name="date_of_birth" class="text-input" required>
+                <div class="error-msg" id="err-date_of_birth"></div>
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Place of Birth</label>
+                <label class="display-lang-gu" style="display: none;">જન્મ સ્થાન</label>
+                <input type="text" name="place_of_birth" class="text-input" placeholder="City / Town">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="display-lang-en">Marital Status</label>
+                <label class="display-lang-gu" style="display: none;">વૈવાહિક પરિસ્થિતિ</label>
+                <select name="marital_status" class="text-input select-field">
+                  <option value="Unmarried">Unmarried / કુંવારા</option>
+                  <option value="Married">Married / પરિણિત</option>
+                  <option value="Widower">Widower / વિધુર</option>
+                  <option value="Widow">Widow / વિધવા</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Current Occupation</label>
+                <label class="display-lang-gu" style="display: none;">વ્યવસાય</label>
+                <input type="text" name="occupation" class="text-input" placeholder="Current profession">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="display-lang-en">Previous Occupation</label>
+                <label class="display-lang-gu" style="display: none;">પૂર્વેનો વ્યવસાય</label>
+                <input type="text" name="previous_occupation" class="text-input" placeholder="Former profession">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Annual Income (₹)</label>
+                <label class="display-lang-gu" style="display: none;">વાર્ષિક આવક</label>
+                <input type="text" name="annual_income" class="text-input" placeholder="Annual income in Rupees">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="display-lang-en">Source of Income</label>
+                <label class="display-lang-gu" style="display: none;">આવકનો સ્ત્રોત</label>
+                <input type="text" name="income_source" class="text-input" placeholder="Where does it come from?">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Pension Details</label>
+                <label class="display-lang-gu" style="display: none;">પેન્શનની વિગત</label>
+                <input type="text" name="pension_details" class="text-input" placeholder="If receiving pension">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="display-lang-en">Movable / Immovable Property</label>
+                <label class="display-lang-gu" style="display: none;">સ્થાવર-જંગમ મિલકત</label>
+                <input type="text" name="movable_immovable_property" class="text-input" placeholder="Details of properties">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Caste and Sub-caste</label>
+                <label class="display-lang-gu" style="display: none;">જાતિ અને પેટા જાતિ</label>
+                <input type="text" name="caste_subcaste" class="text-input" placeholder="Caste detail">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="display-lang-en">Native Place (Hometown)</label>
+                <label class="display-lang-gu" style="display: none;">મૂળવતન</label>
+                <input type="text" name="native_place" class="text-input" placeholder="Hometown">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Stayed in other old-age home before?</label>
+                <label class="display-lang-gu" style="display: none;">બીજા કોઈ વૃદ્ધાશ્રમમાં રહ્યા છો?</label>
+                <input type="text" name="previous_ashram_stay" class="text-input" placeholder="Yes / No (If yes, specify name)">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="display-lang-en">Brief self-introduction (nature, skills, hobbies, what service can you offer at the ashram?)</label>
+              <label class="display-lang-gu" style="display: none;">પોતાનો પરિચય ટૂંકમાં આપો (સ્વભાવ-આવડત-શોખ-આશ્રમમાં શું સેવા આપી શકો?)</label>
+              <textarea name="self_introduction" class="text-input textarea-field" placeholder="Share a few lines about yourself"></textarea>
+            </div>
+          </div>
+
+          <!-- Section 2: Health Details -->
+          <div class="form-card">
+            <div class="card-header border-coral">
+              <h2 class="display-lang-en">2. Physical and Mental Condition Details</h2>
+              <h2 class="display-lang-gu" style="display: none;">૨. શારીરિક તેમજ માનસિક પરિસ્થિતિની વિગત</h2>
+            </div>
+
+            <div class="form-row-3">
+              <div class="form-group">
+                <label class="display-lang-en">Height</label>
+                <label class="display-lang-gu" style="display: none;">ઊંચાઈ</label>
+                <input type="text" name="height" class="text-input" placeholder="e.g. 5'6''">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Weight</label>
+                <label class="display-lang-gu" style="display: none;">વજન</label>
+                <input type="text" name="weight" class="text-input" placeholder="e.g. 60 kg">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Blood Group</label>
+                <label class="display-lang-gu" style="display: none;">બ્લડગ્રુપ</label>
+                <input type="text" name="blood_group" class="text-input" placeholder="e.g. B+">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="display-lang-en">Identification Mark</label>
+                <label class="display-lang-gu" style="display: none;">નોંધપાત્ર નિશાન</label>
+                <input type="text" name="identification_mark" class="text-input" placeholder="Any visible mark">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Blood Pressure</label>
+                <label class="display-lang-gu" style="display: none;">બ્લડ પ્રેશર</label>
+                <input type="text" name="blood_pressure" class="text-input" placeholder="Normal / High / Low">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="display-lang-en">Diabetes</label>
+                <label class="display-lang-gu" style="display: none;">ડાયાબીટીસ</label>
+                <input type="text" name="diabetes" class="text-input" placeholder="Yes / No (If yes, specify)">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Chronic Illness?</label>
+                <label class="display-lang-gu" style="display: none;">કાયમી બિમારી?</label>
+                <input type="text" name="chronic_illness" class="text-input" placeholder="Any chronic condition">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="display-lang-en">Serious Illness?</label>
+                <label class="display-lang-gu" style="display: none;">ગંભીર બિમારી?</label>
+                <input type="text" name="serious_illness" class="text-input" placeholder="Any serious condition">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Any Operation?</label>
+                <label class="display-lang-gu" style="display: none;">કોઈ ઓપરેશન?</label>
+                <input type="text" name="any_operation" class="text-input" placeholder="Details of surgeries">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="display-lang-en">Cataract or other operation done?</label>
+                <label class="display-lang-gu" style="display: none;">મોતીયા કે અન્ય કોઈ ઓપરેશન કરાવ્યું છે?</label>
+                <input type="text" name="cataract_or_other_operation" class="text-input" placeholder="Cataract details">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Teeth condition</label>
+                <label class="display-lang-gu" style="display: none;">દાંત</label>
+                <input type="text" name="teeth" class="text-input" placeholder="Natural / Dentures">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="display-lang-en">Regular Medication</label>
+              <label class="display-lang-gu" style="display: none;">કાયમી દવા</label>
+              <textarea name="regular_medication" class="text-input textarea-field" placeholder="List daily medications"></textarea>
+            </div>
+
+            <div class="note-box alert-warning">
+              <p class="display-lang-en">⚠️ Note: A doctor's health certificate is required to be submitted at the time of admission.</p>
+              <p class="display-lang-gu" style="display: none;">⚠️ ડૉક્ટરનું સર્ટીફિકેટ તમારા સ્વાસ્થ્ય અંગેનું લાવવું જરૂરી છે.</p>
+            </div>
+
+            <div class="form-row-3">
+              <div class="form-group">
+                <label class="display-lang-en">Doctor's Signature / Name</label>
+                <label class="display-lang-gu" style="display: none;">ડૉક્ટરની સહી / નામ</label>
+                <input type="text" name="doctor_signature" class="text-input" placeholder="Dr. Name">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Responsible Person (Name)</label>
+                <label class="display-lang-gu" style="display: none;">જવાબદાર વ્યક્તિ (નામ)</label>
+                <input type="text" name="responsible_person_name_side" class="text-input" placeholder="Signee Name">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Telephone Number</label>
+                <label class="display-lang-gu" style="display: none;">ટેલીફોન નંબર</label>
+                <input type="tel" name="responsible_person_phone_side" class="text-input" placeholder="Phone">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Family Details -->
+          <div class="form-card">
+            <div class="card-header border-coral">
+              <h2 class="display-lang-en">3. Family Situation</h2>
+              <h2 class="display-lang-gu" style="display: none;">૩. કૌટુંબિક પરિસ્થિતિ</h2>
+            </div>
+            
+            <p class="section-desc display-lang-en">Details of children (Son / Daughter):</p>
+            <p class="section-desc display-lang-gu" style="display: none;">પુત્ર / પુત્રીની વિગતો:</p>
+
+            <div class="table-responsive">
+              <table class="family-table">
+                <thead>
+                  <tr>
+                    <th class="display-lang-en">Name of Son/Daughter</th>
+                    <th class="display-lang-gu" style="display: none;">પુત્ર/પુત્રીના નામ</th>
+                    <th class="display-lang-en">Age</th>
+                    <th class="display-lang-gu" style="display: none;">ઉંમર</th>
+                    <th class="display-lang-en">Occupation</th>
+                    <th class="display-lang-gu" style="display: none;">વ્યવસાય</th>
+                    <th class="display-lang-en">Annual Income</th>
+                    <th class="display-lang-gu" style="display: none;">વાર્ષિક આવક</th>
+                    <th class="display-lang-en">Residence & Phone</th>
+                    <th class="display-lang-gu" style="display: none;">રહેઠાણ સ્થળ, ટેલીફોન નં.</th>
+                  </tr>
+                </thead>
+                <tbody id="children-rows">
+                  <!-- Generated via script or pre-written -->
+                  <tr>
+                    <td><input type="text" name="child_1_name" class="table-input"></td>
+                    <td><input type="text" name="child_1_age" class="table-input"></td>
+                    <td><input type="text" name="child_1_occupation" class="table-input"></td>
+                    <td><input type="text" name="child_1_income" class="table-input"></td>
+                    <td><input type="text" name="child_1_contact" class="table-input"></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" name="child_2_name" class="table-input"></td>
+                    <td><input type="text" name="child_2_age" class="table-input"></td>
+                    <td><input type="text" name="child_2_occupation" class="table-input"></td>
+                    <td><input type="text" name="child_2_income" class="table-input"></td>
+                    <td><input type="text" name="child_2_contact" class="table-input"></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" name="child_3_name" class="table-input"></td>
+                    <td><input type="text" name="child_3_age" class="table-input"></td>
+                    <td><input type="text" name="child_3_occupation" class="table-input"></td>
+                    <td><input type="text" name="child_3_income" class="table-input"></td>
+                    <td><input type="text" name="child_3_contact" class="table-input"></td>
+                  </tr>
+                  <tr>
+                    <td><input type="text" name="child_4_name" class="table-input"></td>
+                    <td><input type="text" name="child_4_age" class="table-input"></td>
+                    <td><input type="text" name="child_4_occupation" class="table-input"></td>
+                    <td><input type="text" name="child_4_income" class="table-input"></td>
+                    <td><input type="text" name="child_4_contact" class="table-input"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p class="section-desc display-lang-en" style="margin-top: 20px;">Spouse Details (Husband / Wife):</p>
+            <p class="section-desc display-lang-gu" style="margin-top: 20px; display: none;">પતિ / પત્નીની વિગત:</p>
+
+            <div class="form-row-3">
+              <div class="form-group">
+                <label class="display-lang-en">Spouse Name</label>
+                <label class="display-lang-gu" style="display: none;">પતિ / પત્નીનું નામ</label>
+                <input type="text" name="spouse_name" class="text-input" placeholder="Spouse name">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Age</label>
+                <label class="display-lang-gu" style="display: none;">ઉંમર</label>
+                <input type="number" name="spouse_age" class="text-input" placeholder="Age">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Occupation</label>
+                <label class="display-lang-gu" style="display: none;">વ્યવસાય</label>
+                <input type="text" name="spouse_occupation" class="text-input" placeholder="Occupation">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="display-lang-en">Annual Income</label>
+                <label class="display-lang-gu" style="display: none;">વાર્ષિક આવક</label>
+                <input type="text" name="spouse_income" class="text-input" placeholder="Annual Income">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Residence & Contact Phone</label>
+                <label class="display-lang-gu" style="display: none;">રહેઠાણ તેમજ ફોન નંબર</label>
+                <input type="text" name="spouse_contact" class="text-input" placeholder="Address and Phone">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Nominee Details -->
+          <div class="form-card">
+            <div class="card-header border-coral">
+              <h2 class="display-lang-en">4. Details of the Applicant's Nominee</h2>
+              <h2 class="display-lang-gu" style="display: none;">૪. અરજદારના નોમીનીની વિગત</h2>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="required display-lang-en">Nominee Name</label>
+                <label class="required display-lang-gu" style="display: none;">નોમીનીનું નામ</label>
+                <input type="text" name="nominee_name" class="text-input" required placeholder="Full name of nominee">
+                <div class="error-msg" id="err-nominee_name"></div>
+              </div>
+              <div class="form-group">
+                <label class="required display-lang-en">Relation to Applicant</label>
+                <label class="required display-lang-gu" style="display: none;">અરજદાર સાથે સંબંધ (સગાઈ)</label>
+                <input type="text" name="nominee_relation" class="text-input" required placeholder="e.g. Son, Daughter, Friend">
+                <div class="error-msg" id="err-nominee_relation"></div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="required display-lang-en">Address</label>
+              <label class="required display-lang-gu" style="display: none;">સરનામું</label>
+              <textarea name="nominee_address" class="text-input textarea-field" required placeholder="Nominee's address"></textarea>
+              <div class="error-msg" id="err-nominee_address"></div>
+            </div>
+
+            <div class="form-row-3">
+              <div class="form-group">
+                <label class="required display-lang-en">Telephone Number</label>
+                <label class="required display-lang-gu" style="display: none;">ટેલીફોન નંબર</label>
+                <input type="tel" name="nominee_phone" class="text-input" required placeholder="Phone number">
+                <div class="error-msg" id="err-nominee_phone"></div>
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Date</label>
+                <label class="display-lang-gu" style="display: none;">તારીખ</label>
+                <input type="date" name="nominee_date" class="text-input">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Applicant's Signature/Consent</label>
+                <label class="display-lang-gu" style="display: none;">અરજદારની સહી/સંમતિ</label>
+                <input type="text" name="applicant_signature" class="text-input" placeholder="Type applicant's name to sign">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 5: Responsible Person in Emergency -->
+          <div class="form-card">
+            <div class="card-header border-coral">
+              <h2 class="display-lang-en">5. For Illness / Emergency & Expenses</h2>
+              <h2 class="display-lang-gu" style="display: none;">૫. માંદગી અથવા ઈમરજન્સી વખતે તથા ખર્ચ માટે</h2>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="required display-lang-en">Responsible Person Name</label>
+                <label class="required display-lang-gu" style="display: none;">જવાબદાર વ્યક્તિનું નામ</label>
+                <input type="text" name="responsible_person_name" class="text-input" required placeholder="Full name">
+                <div class="error-msg" id="err-responsible_person_name"></div>
+              </div>
+              <div class="form-group">
+                <label class="required display-lang-en">Relation to Applicant</label>
+                <label class="required display-lang-gu" style="display: none;">સંબંધ</label>
+                <input type="text" name="responsible_person_relation" class="text-input" required placeholder="e.g. Son, Daughter">
+                <div class="error-msg" id="err-responsible_person_relation"></div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="required display-lang-en">Address</label>
+              <label class="required display-lang-gu" style="display: none;">જવાબદાર વ્યક્તિનું સરનામું</label>
+              <textarea name="responsible_person_address" class="text-input textarea-field" required placeholder="Address"></textarea>
+              <div class="error-msg" id="err-responsible_person_address"></div>
+            </div>
+
+            <div class="form-row-3">
+              <div class="form-group">
+                <label class="required display-lang-en">Telephone / Phone</label>
+                <label class="required display-lang-gu" style="display: none;">ટેલીફોન નંબર</label>
+                <input type="tel" name="responsible_person_phone" class="text-input" required placeholder="Phone number">
+                <div class="error-msg" id="err-responsible_person_phone"></div>
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Date</label>
+                <label class="display-lang-gu" style="display: none;">તારીખ</label>
+                <input type="date" name="responsible_date" class="text-input">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Signature (Responsible Person)</label>
+                <label class="display-lang-gu" style="display: none;">જવાબદાર વ્યક્તિની સહી</label>
+                <input type="text" name="responsible_person_signature" class="text-input" placeholder="Type name to sign">
+              </div>
+            </div>
+
+            <!-- Dynamic Declaration Text -->
+            <div class="declaration-box">
+              <h3 class="display-lang-en">Declaration / ઘોષણા</h3>
+              <p class="declaration-text display-lang-en" id="dec-text-en">
+                The applicant is my relative. They want to enter the ashram of their own free will. They are fully aware of the rules. I bind myself to take them back when notified by trustees. In case of death during their stay, if I am unable to be present, I authorize trustees to conduct the final rites. I bind myself to pay the monthly costs.
+              </p>
+              <p class="declaration-text display-lang-gu" id="dec-text-gu" style="display: none;">
+                અરજદારશ્રી મારા સગા છે. પોતાની રાજીખુશીથી આશ્રમમાં દાખલ થવા માંગે છે. આશ્રમના નીતિનિયમોથી તેમને સંપૂર્ણપણે વાકેફ કરવામાં આવેલ છે. આશ્રમના નિયામક/ટ્રસ્ટીઓ જ્યારે ખબર આપશે ત્યારે તેમને લઈ જવા હું બંધાઉં છું. તેમનું મૃત્યુ આશ્રમના રહેઠાણ દરમ્યાન થાય અને જો હાજર ન રહી શકું તો આશ્રમના નિયામક/ટ્રસ્ટીઓને તેમનો અગ્નિ સંસ્કાર કરવાની વિનંતી કરું છું. તેમનો આશ્રમમાં રહેવાનો ખર્ચ વખતોવખત જે નક્કી થાય તે આપવા હું બંધાઉં છું.
+              </p>
+            </div>
+          </div>
+
+          <!-- Section 6: Rules Acknowledgement -->
+          <div class="form-card">
+            <div class="card-header border-coral">
+              <h2 class="display-lang-en">6. Acknowledgement of Ashram Rules</h2>
+              <h2 class="display-lang-gu" style="display: none;">૬. આશ્રમના નીતિ નિયમોની જાણકારી</h2>
+            </div>
+
+            <div class="checkbox-container">
+              <input type="checkbox" id="rules_read_acknowledgement" name="rules_read_acknowledgement" required>
+              <label for="rules_read_acknowledgement" class="display-lang-en required">I have read the ashram's policy rules. I also agree to abide by any rules made hereafter.</label>
+              <label for="rules_read_acknowledgement" class="display-lang-gu required" style="display: none;">આશ્રમના નીતિ નિયમો મેં વાંચ્યા છે. તે ઉપરાંત જે કાંઈ નિયમો હવે પછી કરવામાં આવશે તેનું પાલન કરવા હું બંધાઉ છું.</label>
+            </div>
+            <div class="error-msg" id="err-rules_read_acknowledgement"></div>
+
+            <div class="form-row" style="margin-top: 15px;">
+              <div class="form-group">
+                <label class="display-lang-en">Date</label>
+                <label class="display-lang-gu" style="display: none;">તારીખ</label>
+                <input type="date" name="ack_date" class="text-input">
+              </div>
+              <div class="form-group">
+                <label class="display-lang-en">Signature</label>
+                <label class="display-lang-gu" style="display: none;">વ્યક્તિની સહી</label>
+                <input type="text" name="person_signature" class="text-input" placeholder="Type name to sign">
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="submit-container">
+            <button type="submit" class="button-primary btn-large display-lang-en">Submit Application</button>
+            <button type="submit" class="button-primary btn-large display-lang-gu" style="display: none;">અરજી સબમિટ કરો</button>
+          </div>
+
+          <!-- Result/Message Box -->
+          <div id="form-result" class="result-box" style="display: none;"></div>
+
+        </form>
+      </div>
+
+      <!-- Right Column: Operational Rules Sidebar -->
+      <div class="sidebar-column">
+        <div class="sidebar-card">
+          <div class="card-header bg-dark">
+            <h2 class="display-lang-en">Ashram Rules & Terms</h2>
+            <h2 class="display-lang-gu" style="display: none;">આશ્રમના નીતિ નિયમો</h2>
+          </div>
+          <div class="sidebar-content">
+            <ol class="rules-list display-lang-en">
+              <li>According to the rules, deposit, admission fee, and monthly charge must be submitted along with this form and 3 passport size photographs of the elderly member. One passport size photograph of the responsible person is also required.</li>
+              <li>Initially, admission will be on a temporary basis for 1 month.</li>
+              <li>Monthly support contribution must be paid before the 10th of every month.</li>
+              <li>Admission is prohibited for anyone with infectious diseases, any kind of addiction, mental instability, or intellectual disability.</li>
+              <li>Residents must be present at the designated place on time for prayers, hymns, tea, and meals. Residents wishing to travel out of town must seek permission from the manager.</li>
+              <li>Use the ashram properties carefully. Violators will be discharged. Residents should live with brotherhood, cooperation, and mutual understanding.</li>
+              <li>Electrical appliances from outside are not permitted. Wastage of water or electricity will not be tolerated. Strict cleanliness is maintained.</li>
+              <li>Essentials such as a pot, tumbler, blanket, mattress, bedsheet, and pillow will be provided. Other than these, medicine and personal requirements must be managed by oneself.</li>
+              <li>Trustees/Directors can ask a resident to leave without specifying reasons.</li>
+              <li>Residents must inform 15 days in advance for refund of security deposits.</li>
+              <li>Ration card and Aadhar card photocopy of applicant and Aadhar card copy of the responsible person must be attached.</li>
+              <li>Residents must perform any assigned duties sincerely according to their strength and ability.</li>
+              <li>Admission is confirmed only after receiving a medical fitness certificate from the Ashram Doctor.</li>
+            </ol>
+            
+            <ol class="rules-list display-lang-gu" style="display: none;">
+              <li>અશક્તાશ્રમના નિયમ પ્રમાણે ડીપોઝીટ, દાખલ ફી, તથા માસિક સહયોગ આ ફોર્મ ભરીને ત્રણ પાસપોર્ટ સાઈઝના ફોટા સાથે પ્રવેશ ઈચ્છતા વડીલે સંચાલક કે ટ્રસ્ટીને મળવાનું રહેશે. જવાબદાર વ્યક્તિનો પાસપોર્ટ સાઈઝનો એક ફોટો આપવાનો રહેશે.</li>
+              <li>શરુઆતમાં ૧ મહિના માટે હંગામી ધોરણે દાખલ કરવામાં આવશે.</li>
+              <li>માસિક ફી તા. ૧૦મી પહેલા આપી દેવાની રહેશે.</li>
+              <li>આશ્રમમાં ચેપીરોગ, કોઈપણ વ્યસનવાળી, માનસિક અસ્થિરતા અથવા મંદબુદ્ધિવાળી વ્યક્તિને પ્રવેશ માટે નિષેધ છે.</li>
+              <li>આશ્રમમાં રહેનારે સમયસર પ્રાર્થના, ભજન, ચા અને જમવા માટે નિયત સ્થળે હાજર રહેવું પડશે. બહારગામ જવા ઈચ્છતા આશ્રમવાસીએ મેનેજરની પરવાનગી લેવાની રહેશે.</li>
+              <li>આશ્રમની મિલ્કત પોતાની મિલ્કતને સંભાળપૂર્વક વાપરે તેમ વાપરવી. નુકશાન કરનારને રજા આપવામાં આવશે.</li>
+              <li>આશ્રમના કોઈપણ ઈલેક્ટ્રીક ઉપકરણનો ઉપયોગ થઈ શકશે નહીં. પાણીનો કે વિજળીનો બગાડ ચલાવી લેવામાં આવશે નહિ.</li>
+              <li>આશ્રમમાં રહેવા આવનાર માટે લોટો, પવાલુ, ચારસો, ધાબળો, ગાદલું, ચાદર, ઓશીકું વિ. આપવામાં આવશે.</li>
+              <li>આશ્રમવાસીને કોઈપણ જાતના કારણ જણાવ્યા વગર સંચાલક કે ટ્રસ્ટી આશ્રમ ખાલી કરવાની ફરજ પાડી શકે.</li>
+              <li>આશ્રમ છોડનારે ડીપોઝીટ રીફંડ માટે પંદર દિવસ અગાઉ જાણ કરવાની રહેશે.</li>
+              <li>અરજી ફોર્મ સાથે અરજદારનું રેશનકાર્ડ અને આધારકાર્ડની ઝેરોક્ષ કોપી તેમજ જવાબદાર વ્યક્તિના આધારકાર્ડની ઝેરોક્ષ કોપી સાથે બીડવી જરૂરી છે.</li>
+              <li>આશ્રમના ઘટિત સંચાલન માટે તમારી શક્તિ અને આવડત મુજબ સંચાલકોએ નક્કી કરેલ જવાબદારી નિષ્ઠાપૂર્વક બજાવવાની રહેશે.</li>
+              <li>આશ્રમના ડૉક્ટરના મેડીકલ ફીટનેસના સર્ટીફિકેટ મેળવ્યા પછી જ આશ્રમમાં દાખલ કરવામાં આવશે.</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Office Section: Director Approval Visual Block -->
+        <div class="sidebar-card status-card">
+          <div class="card-header bg-dark">
+            <h2 class="display-lang-en">For Office Use Only</h2>
+            <h2 class="display-lang-gu" style="display: none;">માત્ર ઓફિસ ઉપયોગ માટે</h2>
+          </div>
+          <div class="sidebar-content">
+            <div class="form-group">
+              <label class="display-lang-en">Admission Date</label>
+              <label class="display-lang-gu" style="display: none;">દાખલ કરવાની તારીખ</label>
+              <input type="text" class="text-input" readonly placeholder="Assigned upon approval">
+            </div>
+            <div class="form-group">
+              <label class="display-lang-en">Monthly Charge Approved (₹)</label>
+              <label class="display-lang-gu" style="display: none;">મંજૂર માસિક ચાર્જ (રૂ.)</label>
+              <input type="text" class="text-input" readonly placeholder="TBD by Director">
+            </div>
+            <div class="form-group">
+              <label class="display-lang-en">Director Signature</label>
+              <label class="display-lang-gu" style="display: none;">નિયામકની સહી</label>
+              <input type="text" class="text-input" readonly placeholder="Pending Signature">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <svg class="brand-spike" viewBox="0 0 24 24" width="24" height="24">
+          <path fill="currentColor" d="M12 2v20M2 12h20M5 5l14 14M5 19L19 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="display-lang-en">Shantilal Mohanlal Ashaktashram Society</span>
+        <span class="display-lang-gu" style="display: none;">શાંતિલાલ મોહનલાલ અશક્તાશ્રમ સોસાયટી</span>
+      </div>
+      <p class="copyright display-lang-en">© 2026 Shantilal Mohanlal Ashaktashram Society. All Rights Reserved.</p>
+      <p class="copyright display-lang-gu" style="display: none;">© ૨૦૨૬ શાંતિલાલ મોહનલાલ અશક્તાશ્રમ સોસાયટી. તમામ હક અનામત.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

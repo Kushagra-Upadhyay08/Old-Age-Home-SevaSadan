@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:alpine
+    container_name: old_sevasadan_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - old_sevasadan_network
+
+  web:
+    build: .
+    image: old_sevasadan
+    container_name: old_sevasadan
+    ports:
+      - "3000:3000"
+    environment:
+      - REDIS_URL=redis://old_sevasadan_redis:6379
+      - PORT=3000
+    depends_on:
+      - redis
+    networks:
+      - old_sevasadan_network
+
+volumes:
+  redis_data:
+
+networks:
+  old_sevasadan_network:
+    driver: bridge
