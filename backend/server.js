@@ -5,10 +5,17 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const fs = require('fs');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ashaktashram_secret_key_2026';
+
+// Allow CORS for Vercel, localhost, or any frontend domain
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 
 // Paths
 const frontendDir = process.env.FRONTEND_DIR || path.resolve(__dirname, '..', 'frontend');

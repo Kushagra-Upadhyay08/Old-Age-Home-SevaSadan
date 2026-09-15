@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const userRole = userData.role;
   const API = (url, opts = {}) => {
     opts.headers = { ...(opts.headers || {}), 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
-    return fetch(url, opts);
+    const fullUrl = window.getApiUrl ? window.getApiUrl(url) : url;
+    return fetch(fullUrl, opts);
   };
 
   // ============================================================
@@ -59,7 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (userNameEl) userNameEl.textContent = userData.username.charAt(0).toUpperCase() + userData.username.slice(1);
   if (userRoleBadge) userRoleBadge.textContent = userRole;
   if (userData.profilePhoto && userAvatarEl) {
-    userAvatarEl.innerHTML = `<img src="${userData.profilePhoto}" alt="Profile">`;
+    const avatarUrl = window.getAssetUrl ? window.getAssetUrl(userData.profilePhoto) : userData.profilePhoto;
+    userAvatarEl.innerHTML = `<img src="${avatarUrl}" alt="Profile">`;
   }
 
   if (userRole === 'admin') {
@@ -1176,13 +1178,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const file = e.target.files[0]; if (!file) return;
       const fd = new FormData(); fd.append('photo', file);
       try {
-        const res = await fetch('/api/profile/photo', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: fd });
+        const photoUrl = window.getApiUrl ? window.getApiUrl('/api/profile/photo') : '/api/profile/photo';
+        const res = await fetch(photoUrl, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: fd });
         const data = await res.json();
         if (data.success) {
           userData.profilePhoto = data.profilePhoto;
           localStorage.setItem('user_data', JSON.stringify(userData));
-          document.getElementById('settings-photo-preview').innerHTML = `<img src="${data.profilePhoto}" alt="Profile">`;
-          document.getElementById('user-avatar').innerHTML = `<img src="${data.profilePhoto}" alt="Profile">`;
+          const imgUrl = window.getAssetUrl ? window.getAssetUrl(data.profilePhoto) : data.profilePhoto;
+          document.getElementById('settings-photo-preview').innerHTML = `<img src="${imgUrl}" alt="Profile">`;
+          document.getElementById('user-avatar').innerHTML = `<img src="${imgUrl}" alt="Profile">`;
         }
       } catch (err) { console.error(err); }
     });

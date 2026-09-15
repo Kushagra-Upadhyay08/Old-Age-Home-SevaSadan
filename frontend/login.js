@@ -56,7 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
     loginBtn.innerHTML = '<span class="spinner"></span>';
 
     try {
-      const res = await fetch('/api/login', {
+      const loginUrl = window.getApiUrl ? window.getApiUrl('/api/login') : '/api/login';
+      const res = await fetch(loginUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: username.toLowerCase(), password })
