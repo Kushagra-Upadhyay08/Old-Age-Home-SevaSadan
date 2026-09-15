@@ -2,10 +2,10 @@
   "name": "old_sevasadan",
   "version": "2.0.0",
   "description": "Admission & Donation management system with RBAC, authentication, and PDF generation",
-  "main": "backend/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "node backend/server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
