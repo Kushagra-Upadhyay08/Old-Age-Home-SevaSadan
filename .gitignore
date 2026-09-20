@@ -3,3 +3,8 @@ node_modules/
 redis_data/
 .DS_Store
 *.log
+*.db
+*.db-*
+uploads/
+backend/uploads/
+
