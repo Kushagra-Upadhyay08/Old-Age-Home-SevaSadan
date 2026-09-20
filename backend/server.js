@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const fs = require('fs');
 const cors = require('cors');
+const Database = require('better-sqlite3');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,54 +24,79 @@ const uploadsDir = path.resolve(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
 // ============================================================
-// In-Memory Store (fallback when Redis is unavailable)
+// SQLite Database Setup
 // ============================================================
-let useRedis = false;
-let redis = null;
-const memStore = {
-  data: {},
-  lists: {},
-  get(key) { return this.data[key] || null; },
-  set(key, value) { this.data[key] = value; },
-  del(key) { delete this.data[key]; },
-  lpush(key, value) {
-    if (!this.lists[key]) this.lists[key] = [];
-    this.lists[key].unshift(value);
-  },
-  lrange(key, start, stop) {
-    if (!this.lists[key]) return [];
-    if (stop === -1) return this.lists[key].slice(start);
-    return this.lists[key].slice(start, stop + 1);
-  },
-  keys(pattern) {
-    const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
-    return Object.keys(this.data).filter(k => regex.test(k));
+const dbPath = path.resolve(__dirname, 'ashaktashram.db');
+const db = new Database(dbPath);
+
+// Enable WAL mode for better concurrent performance
+db.pragma('journal_mode = WAL');
+db.pragma('foreign_keys = ON');
+
+console.log(`📦 SQLite database initialized at: ${dbPath}`);
+
+// Create tables
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    username TEXT PRIMARY KEY,
+    password TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'servant',
+    phone TEXT DEFAULT '',
+    profilePhoto TEXT DEFAULT '',
+    createdAt TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS submissions (
+    id TEXT PRIMARY KEY,
+    applicationNumber INTEGER,
+    data TEXT NOT NULL,
+    submittedBy TEXT,
+    submittedAt TEXT DEFAULT (datetime('now')),
+    office_admission_date TEXT DEFAULT '',
+    office_monthly_charge TEXT DEFAULT '',
+    office_director_signature TEXT DEFAULT ''
+  );
+
+  CREATE TABLE IF NOT EXISTS donations (
+    id TEXT PRIMARY KEY,
+    receiptNumber INTEGER,
+    data TEXT NOT NULL,
+    submittedBy TEXT,
+    submittedAt TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS counters (
+    name TEXT PRIMARY KEY,
+    value INTEGER NOT NULL DEFAULT 0
+  );
+`);
+
+// Initialize counters if they don't exist
+const initCounter = db.prepare('INSERT OR IGNORE INTO counters (name, value) VALUES (?, ?)');
+initCounter.run('applications', 0);
+initCounter.run('donations', 13940);
+
+console.log('✅ Database tables ready.');
+
+// ============================================================
+// Seed Default Users
+// ============================================================
+function seedUsers() {
+  const getUser = db.prepare('SELECT username FROM users WHERE username = ?');
+  const insertUser = db.prepare('INSERT INTO users (username, password, role, phone, profilePhoto, createdAt) VALUES (?, ?, ?, ?, ?, ?)');
+
+  if (!getUser.get('admin')) {
+    const adminHash = bcrypt.hashSync('admin123', 10);
+    insertUser.run('admin', adminHash, 'admin', '', '', new Date().toISOString());
+    console.log('👤 Seeded admin account (admin / admin123)');
   }
-};
-
-// Try to connect to Redis, fall back to in-memory
-try {
-  const Redis = require('ioredis');
-  const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-  redis = new Redis(REDIS_URL, { maxRetriesPerRequest: 3, retryStrategy(times) { if (times > 3) return null; return Math.min(times * 200, 1000); } });
-  redis.on('connect', () => { useRedis = true; console.log('✅ Connected to Redis database.'); });
-  redis.on('error', (err) => {
-    if (useRedis) console.error('Redis error:', err.message);
-    else { console.log('⚠️  Redis unavailable, using in-memory store.'); redis.disconnect(); redis = null; }
-  });
-} catch (e) {
-  console.log('⚠️  Redis module not critical, using in-memory store.');
+  if (!getUser.get('servant')) {
+    const servantHash = bcrypt.hashSync('servant123', 10);
+    insertUser.run('servant', servantHash, 'servant', '', '', new Date().toISOString());
+    console.log('👤 Seeded servant account (servant / servant123)');
+  }
 }
-
-// Unified store interface
-const store = {
-  async get(key) { if (useRedis) return redis.get(key); return memStore.get(key); },
-  async set(key, value) { if (useRedis) return redis.set(key, value); return memStore.set(key, value); },
-  async del(key) { if (useRedis) return redis.del(key); return memStore.del(key); },
-  async lpush(key, value) { if (useRedis) return redis.lpush(key, value); return memStore.lpush(key, value); },
-  async lrange(key, start, stop) { if (useRedis) return redis.lrange(key, start, stop); return memStore.lrange(key, start, stop); },
-  async keys(pattern) { if (useRedis) return redis.keys(pattern); return memStore.keys(pattern); }
-};
+seedUsers();
 
 // ============================================================
 // Middleware
@@ -79,14 +105,27 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Multer config for profile photo
-const storageConfig = multer.diskStorage({
+const profileStorageConfig = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadsDir),
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     cb(null, `profile_${req.user.username}_${Date.now()}${ext}`);
   }
 });
-const upload = multer({ storage: storageConfig, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req, file, cb) => {
+const uploadProfile = multer({ storage: profileStorageConfig, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req, file, cb) => {
+  if (file.mimetype.startsWith('image/')) cb(null, true);
+  else cb(new Error('Only image files allowed'), false);
+}});
+
+// Multer config for director signature
+const signatureStorageConfig = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadsDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `signature_${req.user.username}_${Date.now()}${ext}`);
+  }
+});
+const uploadSignature = multer({ storage: signatureStorageConfig, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) cb(null, true);
   else cb(new Error('Only image files allowed'), false);
 }});
@@ -127,27 +166,6 @@ function requireRole(...roles) {
 }
 
 // ============================================================
-// Seed Default Users
-// ============================================================
-async function seedUsers() {
-  const adminExists = await store.get('user:admin');
-  if (!adminExists) {
-    const adminHash = await bcrypt.hash('admin123', 10);
-    await store.set('user:admin', JSON.stringify({ username: 'admin', password: adminHash, role: 'admin', phone: '', profilePhoto: '', createdAt: new Date().toISOString() }));
-    console.log('👤 Seeded admin account (admin / admin123)');
-  }
-  const servantExists = await store.get('user:servant');
-  if (!servantExists) {
-    const servantHash = await bcrypt.hash('servant123', 10);
-    await store.set('user:servant', JSON.stringify({ username: 'servant', password: servantHash, role: 'servant', phone: '', profilePhoto: '', createdAt: new Date().toISOString() }));
-    console.log('👤 Seeded servant account (servant / servant123)');
-  }
-}
-
-// Seed after a small delay to allow Redis connection
-setTimeout(seedUsers, 1500);
-
-// ============================================================
 // AUTH ROUTES
 // ============================================================
 app.post('/api/login', async (req, res) => {
@@ -155,10 +173,9 @@ app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ success: false, message: 'Username and password required.' });
     
-    const userData = await store.get(`user:${username.toLowerCase()}`);
-    if (!userData) return res.status(401).json({ success: false, message: 'Invalid credentials.' });
+    const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username.toLowerCase());
+    if (!user) return res.status(401).json({ success: false, message: 'Invalid credentials.' });
     
-    const user = JSON.parse(userData);
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(401).json({ success: false, message: 'Invalid credentials.' });
     
@@ -173,46 +190,45 @@ app.post('/api/login', async (req, res) => {
 // ============================================================
 // PROFILE / SETTINGS ROUTES
 // ============================================================
-app.get('/api/profile', authenticateToken, async (req, res) => {
+app.get('/api/profile', authenticateToken, (req, res) => {
   try {
-    const userData = await store.get(`user:${req.user.username}`);
-    if (!userData) return res.status(404).json({ success: false, message: 'User not found.' });
-    const user = JSON.parse(userData);
+    const user = db.prepare('SELECT * FROM users WHERE username = ?').get(req.user.username);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
     return res.json({ success: true, user: { username: user.username, role: user.role, phone: user.phone || '', profilePhoto: user.profilePhoto || '' } });
   } catch (err) {
     return res.status(500).json({ success: false, message: 'Server error.' });
   }
 });
 
-app.put('/api/profile', authenticateToken, async (req, res) => {
+app.put('/api/profile', authenticateToken, (req, res) => {
   try {
-    const userData = await store.get(`user:${req.user.username}`);
-    if (!userData) return res.status(404).json({ success: false, message: 'User not found.' });
-    const user = JSON.parse(userData);
-    if (req.body.phone !== undefined) user.phone = req.body.phone;
-    await store.set(`user:${req.user.username}`, JSON.stringify(user));
-    return res.json({ success: true, message: 'Profile updated.', user: { username: user.username, role: user.role, phone: user.phone, profilePhoto: user.profilePhoto } });
+    const user = db.prepare('SELECT * FROM users WHERE username = ?').get(req.user.username);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+    if (req.body.phone !== undefined) {
+      db.prepare('UPDATE users SET phone = ? WHERE username = ?').run(req.body.phone, req.user.username);
+    }
+    const updated = db.prepare('SELECT * FROM users WHERE username = ?').get(req.user.username);
+    return res.json({ success: true, message: 'Profile updated.', user: { username: updated.username, role: updated.role, phone: updated.phone, profilePhoto: updated.profilePhoto } });
   } catch (err) {
     return res.status(500).json({ success: false, message: 'Server error.' });
   }
 });
 
 app.post('/api/profile/photo', authenticateToken, (req, res, next) => {
-  upload.single('photo')(req, res, async (err) => {
+  uploadProfile.single('photo')(req, res, async (err) => {
     if (err) return res.status(400).json({ success: false, message: err.message });
     if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded.' });
     try {
-      const userData = await store.get(`user:${req.user.username}`);
-      const user = JSON.parse(userData);
+      const user = db.prepare('SELECT * FROM users WHERE username = ?').get(req.user.username);
       // Delete old photo if exists
       if (user.profilePhoto) {
         const oldFile = path.basename(user.profilePhoto);
         const oldPath = path.join(uploadsDir, oldFile);
         if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
       }
-      user.profilePhoto = `/uploads/${req.file.filename}`;
-      await store.set(`user:${req.user.username}`, JSON.stringify(user));
-      return res.json({ success: true, profilePhoto: user.profilePhoto });
+      const newPhoto = `/uploads/${req.file.filename}`;
+      db.prepare('UPDATE users SET profilePhoto = ? WHERE username = ?').run(newPhoto, req.user.username);
+      return res.json({ success: true, profilePhoto: newPhoto });
     } catch (err) {
       return res.status(500).json({ success: false, message: 'Server error.' });
     }
@@ -225,13 +241,12 @@ app.put('/api/change-password', authenticateToken, async (req, res) => {
     if (!oldPassword || !newPassword) return res.status(400).json({ success: false, message: 'Both old and new passwords required.' });
     if (newPassword.length < 6) return res.status(400).json({ success: false, message: 'New password must be at least 6 characters.' });
     
-    const userData = await store.get(`user:${req.user.username}`);
-    const user = JSON.parse(userData);
+    const user = db.prepare('SELECT * FROM users WHERE username = ?').get(req.user.username);
     const valid = await bcrypt.compare(oldPassword, user.password);
     if (!valid) return res.status(401).json({ success: false, message: 'Old password is incorrect.' });
     
-    user.password = await bcrypt.hash(newPassword, 10);
-    await store.set(`user:${req.user.username}`, JSON.stringify(user));
+    const newHash = await bcrypt.hash(newPassword, 10);
+    db.prepare('UPDATE users SET password = ? WHERE username = ?').run(newHash, req.user.username);
     return res.json({ success: true, message: 'Password changed successfully.' });
   } catch (err) {
     return res.status(500).json({ success: false, message: 'Server error.' });
@@ -241,7 +256,7 @@ app.put('/api/change-password', authenticateToken, async (req, res) => {
 // ============================================================
 // ADMISSION FORM ROUTES
 // ============================================================
-app.post('/api/submit', authenticateToken, requireRole('servant'), async (req, res) => {
+app.post('/api/submit', authenticateToken, requireRole('servant', 'admin'), (req, res) => {
   try {
     const formData = req.body;
     const requiredFields = [
@@ -266,20 +281,23 @@ app.post('/api/submit', authenticateToken, requireRole('servant'), async (req, r
     if (isNaN(ageNum) || ageNum <= 0) return res.status(400).json({ success: false, message: 'Age must be a valid number.' });
 
     // Auto-generate application number
-    const countStr = await store.get('counter:applications') || '0';
-    const count = parseInt(countStr, 10) + 1;
-    await store.set('counter:applications', count.toString());
+    const counter = db.prepare('SELECT value FROM counters WHERE name = ?').get('applications');
+    const count = (counter ? counter.value : 0) + 1;
+    db.prepare('UPDATE counters SET value = ? WHERE name = ?').run(count, 'applications');
 
     const submissionId = `application:${Date.now()}:${count}`;
+    const submittedAt = new Date().toISOString();
     const submissionData = {
       ...formData,
       id: submissionId,
       applicationNumber: count,
       submittedBy: req.user.username,
-      submittedAt: new Date().toISOString()
+      submittedAt: submittedAt
     };
-    await store.set(submissionId, JSON.stringify(submissionData));
-    await store.lpush('submissions_list', submissionId);
+
+    db.prepare('INSERT INTO submissions (id, applicationNumber, data, submittedBy, submittedAt) VALUES (?, ?, ?, ?, ?)').run(
+      submissionId, count, JSON.stringify(submissionData), req.user.username, submittedAt
+    );
 
     return res.json({ success: true, message: 'Admission form submitted successfully! / પ્રવેશ અરજી સફળતાપૂર્વક સબમિટ થઈ!', id: submissionId, applicationNumber: count });
   } catch (error) {
@@ -288,17 +306,17 @@ app.post('/api/submit', authenticateToken, requireRole('servant'), async (req, r
   }
 });
 
-app.get('/api/submissions', authenticateToken, async (req, res) => {
+app.get('/api/submissions', authenticateToken, (req, res) => {
   try {
-    const keys = await store.lrange('submissions_list', 0, -1);
-    if (keys.length === 0) return res.json([]);
-    const submissions = [];
-    for (const key of keys) {
-      const val = await store.get(key);
-      if (val) submissions.push(JSON.parse(val));
-    }
-    // Sort by submittedAt descending
-    submissions.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+    const rows = db.prepare('SELECT * FROM submissions ORDER BY submittedAt DESC').all();
+    const submissions = rows.map(row => {
+      const data = JSON.parse(row.data);
+      // Merge office-use fields from the database columns
+      data.office_admission_date = row.office_admission_date || data.office_admission_date || '';
+      data.office_monthly_charge = row.office_monthly_charge || data.office_monthly_charge || '';
+      data.office_director_signature = row.office_director_signature || data.office_director_signature || '';
+      return data;
+    });
     return res.json(submissions);
   } catch (error) {
     console.error('Fetch error:', error);
@@ -307,9 +325,55 @@ app.get('/api/submissions', authenticateToken, async (req, res) => {
 });
 
 // ============================================================
+// OFFICE USE UPDATE (Admin only)
+// ============================================================
+app.put('/api/submissions/:id/office', authenticateToken, requireRole('admin'), (req, res) => {
+  try {
+    const { id } = req.params;
+    const { office_admission_date, office_monthly_charge, office_director_signature } = req.body;
+
+    const row = db.prepare('SELECT * FROM submissions WHERE id = ?').get(id);
+    if (!row) return res.status(404).json({ success: false, message: 'Submission not found.' });
+
+    // Update office-use columns
+    db.prepare('UPDATE submissions SET office_admission_date = ?, office_monthly_charge = ?, office_director_signature = ? WHERE id = ?').run(
+      office_admission_date || '', office_monthly_charge || '', office_director_signature || '', id
+    );
+
+    // Also update the JSON data blob for consistency
+    const data = JSON.parse(row.data);
+    data.office_admission_date = office_admission_date || '';
+    data.office_monthly_charge = office_monthly_charge || '';
+    data.office_director_signature = office_director_signature || '';
+    db.prepare('UPDATE submissions SET data = ? WHERE id = ?').run(JSON.stringify(data), id);
+
+    return res.json({ success: true, message: 'Office use fields updated successfully.' });
+  } catch (error) {
+    console.error('Office update error:', error);
+    return res.status(500).json({ success: false, message: 'Internal Server Error.' });
+  }
+});
+
+// ============================================================
+// SIGNATURE UPLOAD (Admin only)
+// ============================================================
+app.post('/api/upload-signature', authenticateToken, requireRole('admin'), (req, res, next) => {
+  uploadSignature.single('signature')(req, res, (err) => {
+    if (err) return res.status(400).json({ success: false, message: err.message });
+    if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded.' });
+    try {
+      const signaturePath = `/uploads/${req.file.filename}`;
+      return res.json({ success: true, signaturePath: signaturePath });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: 'Server error.' });
+    }
+  });
+});
+
+// ============================================================
 // DONATION RECEIPT ROUTES
 // ============================================================
-app.post('/api/donation', authenticateToken, requireRole('servant'), async (req, res) => {
+app.post('/api/donation', authenticateToken, requireRole('servant'), (req, res) => {
   try {
     const data = req.body;
     const requiredFields = [
@@ -322,20 +386,23 @@ app.post('/api/donation', authenticateToken, requireRole('servant'), async (req,
     if (missing.length > 0) return res.status(400).json({ success: false, message: 'Please fill all required fields.', missing });
 
     // Auto-increment receipt number
-    const countStr = await store.get('counter:donations') || '13940';
-    const count = parseInt(countStr, 10) + 1;
-    await store.set('counter:donations', count.toString());
+    const counter = db.prepare('SELECT value FROM counters WHERE name = ?').get('donations');
+    const count = (counter ? counter.value : 13940) + 1;
+    db.prepare('UPDATE counters SET value = ? WHERE name = ?').run(count, 'donations');
 
     const receiptId = `donation:${Date.now()}:${count}`;
+    const submittedAt = new Date().toISOString();
     const receiptData = {
       ...data,
       id: receiptId,
       receiptNumber: count,
       submittedBy: req.user.username,
-      submittedAt: new Date().toISOString()
+      submittedAt: submittedAt
     };
-    await store.set(receiptId, JSON.stringify(receiptData));
-    await store.lpush('donations_list', receiptId);
+
+    db.prepare('INSERT INTO donations (id, receiptNumber, data, submittedBy, submittedAt) VALUES (?, ?, ?, ?, ?)').run(
+      receiptId, count, JSON.stringify(receiptData), req.user.username, submittedAt
+    );
 
     return res.json({ success: true, message: 'Donation receipt created successfully! / દાન રસીદ સફળતાપૂર્વક બની!', id: receiptId, receiptNumber: count });
   } catch (error) {
@@ -344,16 +411,10 @@ app.post('/api/donation', authenticateToken, requireRole('servant'), async (req,
   }
 });
 
-app.get('/api/donations', authenticateToken, async (req, res) => {
+app.get('/api/donations', authenticateToken, (req, res) => {
   try {
-    const keys = await store.lrange('donations_list', 0, -1);
-    if (keys.length === 0) return res.json([]);
-    const donations = [];
-    for (const key of keys) {
-      const val = await store.get(key);
-      if (val) donations.push(JSON.parse(val));
-    }
-    donations.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+    const rows = db.prepare('SELECT * FROM donations ORDER BY submittedAt DESC').all();
+    const donations = rows.map(row => JSON.parse(row.data));
     return res.json(donations);
   } catch (error) {
     console.error('Fetch error:', error);

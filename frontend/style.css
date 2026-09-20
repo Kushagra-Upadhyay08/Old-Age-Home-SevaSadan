@@ -1431,3 +1431,88 @@ label.required::after { content: " *"; color: var(--color-error); }
   margin-top: 16px;
   line-height: 1.5;
 }
+
+/* ============================================================
+   SIGNATURE UPLOAD
+   ============================================================ */
+.signature-upload-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.signature-preview {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--color-primary);
+  border-radius: var(--rounded-md);
+  padding: 8px;
+  background: var(--color-surface);
+  min-height: 70px;
+  max-height: 120px;
+  overflow: hidden;
+}
+
+.signature-preview img {
+  max-width: 100%;
+  max-height: 100px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.signature-remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-error);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.signature-remove-btn:hover {
+  transform: scale(1.1);
+  background: #c0392b;
+}
+
+.signature-upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 2px dashed var(--color-hairline-strong);
+  border-radius: var(--rounded-md);
+  background: var(--color-surface);
+  color: var(--color-body-strong);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.signature-upload-btn:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+}
+
+.signature-upload-btn svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
