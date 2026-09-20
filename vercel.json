@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "buildCommand": "node build.js",
+  "outputDirectory": "frontend",
+  "rewrites": [
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/",
+      "destination": "/index.html"
+    }
+  ]
+}

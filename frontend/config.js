@@ -2,25 +2,48 @@
 // Ashaktashram Dakor - Frontend Configuration
 // ============================================================
 
-// If you deploy backend on Render and frontend on Vercel:
-// Replace the URL below with your actual Render backend URL,
-// or set it in browser console / localStorage: localStorage.setItem('API_BASE_URL', 'https://your-backend.onrender.com')
+// Default production backend on Render
+const DEFAULT_PROD_BACKEND = 'https://old-age-home-sevasadan.onrender.com';
+
+function sanitizeBackendUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  return url.trim()
+    .replace(/\/dashboard\/?$/i, '')
+    .replace(/\/api\/?$/i, '')
+    .replace(/\/$/, '');
+}
 
 function detectApiBase() {
-  const saved = localStorage.getItem('API_BASE_URL');
-  if (saved) return saved;
-
-  // If already accessing backend directly on port 3000, use relative paths
-  if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '3000') {
-    return '';
+  // 1. Check window.__ENV__ (injected via Vercel build / env.js)
+  const envUrl = window.__ENV__ && (
+    window.__ENV__.BACKEND_URL || 
+    window.__ENV__.API_BASE_URL || 
+    window.__ENV__.NEXT_PUBLIC_API_URL || 
+    window.__ENV__.VITE_API_URL
+  );
+  if (envUrl) {
+    const cleaned = sanitizeBackendUrl(envUrl);
+    if (cleaned) return cleaned;
   }
 
-  // If on localhost/127.0.0.1 on a different port (e.g. Live Server on 5500) or file:// protocol, route to port 3000
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:' || !window.location.hostname) {
+  // 2. Check localStorage override (useful for debugging or manual override)
+  const saved = localStorage.getItem('BACKEND_URL') || localStorage.getItem('API_BASE_URL');
+  if (saved) {
+    const cleaned = sanitizeBackendUrl(saved);
+    if (cleaned) return cleaned;
+  }
+
+  // 3. Localhost development
+  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  if (isLocalhost && window.location.port === '3000') {
+    return '';
+  }
+  if (isLocalhost || window.location.protocol === 'file:' || !window.location.hostname) {
     return 'http://localhost:3000';
   }
 
-  return '';
+  // 4. Default for production deployment (e.g. on Vercel)
+  return DEFAULT_PROD_BACKEND;
 }
 
 window.API_BASE = detectApiBase();
