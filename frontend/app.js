@@ -312,7 +312,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             <div class="form-row-3" style="margin-top:16px;">
               <div class="form-group"><label><span class="display-lang-en">Date</span><span class="display-lang-gu" style="display:none;">તારીખ</span></label><input type="date" name="responsible_date" class="text-input" value="${today}"></div>
-              <div class="form-group"><label><span class="display-lang-en">Responsible Person's Signature</span><span class="display-lang-gu" style="display:none;">જવાબદાર વ્યક્તિની સહી</span></label><input type="text" name="responsible_person_signature" class="text-input" placeholder="Type name to sign"></div>
+              <div class="form-group">
+                <label><span class="display-lang-en">Responsible Person's Signature</span><span class="display-lang-gu" style="display:none;">જવાબદાર વ્યક્તિની સહી</span></label>
+                <div class="signature-upload-area" id="resp-signature-upload-area">
+                  <div class="signature-preview" id="resp-signature-preview" style="display:none;">
+                    <img id="resp-signature-preview-img" src="" alt="Signature Preview">
+                    <button type="button" class="signature-remove-btn" id="remove-resp-signature-btn" title="Remove Signature">&times;</button>
+                  </div>
+                  <label class="signature-upload-btn" id="resp-signature-upload-label">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span class="display-lang-en">Upload Signature Photo</span><span class="display-lang-gu" style="display:none;">સહી ફોટો અપલોડ</span>
+                    <input type="file" id="resp-signature-file" accept="image/*" style="display:none;">
+                  </label>
+                  <input type="text" name="responsible_person_signature" id="resp-signature-input" class="text-input" placeholder="Or type name to sign" style="margin-top:6px;">
+                </div>
+              </div>
               <div class="form-group"></div>
             </div>
           </div>
@@ -344,7 +358,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             <div class="form-row" style="margin-top:16px;">
               <div class="form-group"><label><span class="display-lang-en">Date</span><span class="display-lang-gu" style="display:none;">તારીખ</span></label><input type="date" name="ack_date" class="text-input" value="${today}"></div>
-              <div class="form-group"><label><span class="display-lang-en">Applicant/Person's Signature</span><span class="display-lang-gu" style="display:none;">અરજદાર/વ્યક્તિની સહી</span></label><input type="text" name="person_signature" class="text-input" placeholder="Type name to sign"></div>
+              <div class="form-group">
+                <label><span class="display-lang-en">Applicant/Person's Signature</span><span class="display-lang-gu" style="display:none;">અરજદાર/વ્યક્તિની સહી</span></label>
+                <div class="signature-upload-area" id="person-signature-upload-area">
+                  <div class="signature-preview" id="person-signature-preview" style="display:none;">
+                    <img id="person-signature-preview-img" src="" alt="Signature Preview">
+                    <button type="button" class="signature-remove-btn" id="remove-person-signature-btn" title="Remove Signature">&times;</button>
+                  </div>
+                  <label class="signature-upload-btn" id="person-signature-upload-label">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span class="display-lang-en">Upload Signature Photo</span><span class="display-lang-gu" style="display:none;">સહી ફોટો અપલોડ</span>
+                    <input type="file" id="person-signature-file" accept="image/*" style="display:none;">
+                  </label>
+                  <input type="text" name="person_signature" id="person-signature-input" class="text-input" placeholder="Or type name to sign" style="margin-top:6px;">
+                </div>
+              </div>
             </div>
           </div>
 
@@ -353,11 +381,16 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="card-header bg-dark"><h2><span class="display-lang-en">For Office Use — Director's Approval & Signature</span><span class="display-lang-gu" style="display:none;">આશ્રમના નિયામકશ્રીની મંજૂરી તથા સહી</span></h2></div>
             <p class="section-desc" style="margin-bottom:12px;"><span class="display-lang-en">Shri ___ is admitted to the ashram from date ___. Monthly charge Rs. ___ is guaranteed by Shri ___.</span><span class="display-lang-gu" style="display:none;">શ્રી ___ ને આશ્રમ તા. ___ થી દાખલ કરવામાં આવે છે. માસિક રૂ. ___ ચાર્જ આપવા શ્રી ___ એ બાંયધરી આપી છે.</span></p>
             <div class="form-row-3">
-              <div class="form-group"><label><span class="display-lang-en">Admission Date</span><span class="display-lang-gu" style="display:none;">દાખલ કરવાની તારીખ</span></label><input type="${userRole === 'admin' ? 'date' : 'text'}" name="office_admission_date" class="text-input" ${userRole !== 'admin' ? 'readonly placeholder="Assigned upon approval"' : ''}></div>
-              <div class="form-group"><label><span class="display-lang-en">Monthly Charge (₹)</span><span class="display-lang-gu" style="display:none;">મંજૂર માસિક ચાર્જ (રૂ.)</span></label><input type="${userRole === 'admin' ? 'number' : 'text'}" name="office_monthly_charge" class="text-input" ${userRole !== 'admin' ? 'readonly placeholder="TBD by Director"' : 'placeholder="Enter amount" min="0"'}></div>
+              <div class="form-group">
+                <label><span class="display-lang-en">Admission Date</span><span class="display-lang-gu" style="display:none;">દાખલ કરવાની તારીખ</span></label>
+                <input type="date" name="office_admission_date" class="text-input" value="${today}">
+              </div>
+              <div class="form-group">
+                <label><span class="display-lang-en">Monthly Charge (₹)</span><span class="display-lang-gu" style="display:none;">મંજૂર માસિક ચાર્જ (રૂ.)</span></label>
+                <input type="number" name="office_monthly_charge" class="text-input" placeholder="Enter amount" min="0">
+              </div>
               <div class="form-group">
                 <label><span class="display-lang-en">Director Signature</span><span class="display-lang-gu" style="display:none;">નિયામકની સહી</span></label>
-                ${userRole === 'admin' ? `
                 <div class="signature-upload-area" id="signature-upload-area">
                   <div class="signature-preview" id="signature-preview" style="display:none;">
                     <img id="signature-preview-img" src="" alt="Signature Preview">
@@ -369,8 +402,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="file" id="director-signature-file" accept="image/*" style="display:none;">
                   </label>
                   <input type="hidden" name="office_director_signature" id="office-director-signature-path" value="">
+                  <input type="text" name="office_director_signature_text" id="office-director-signature-text" class="text-input" placeholder="Or type director name" style="margin-top:6px;">
                 </div>
-                ` : `<input type="text" name="office_director_signature" class="text-input" readonly placeholder="Pending Signature">`}
               </div>
             </div>
           </div>
@@ -443,25 +476,24 @@ document.addEventListener('DOMContentLoaded', () => {
       updateLangDisplay();
     });
 
-    // Director signature upload handler (admin only)
-    if (userRole === 'admin') {
-      const sigFileInput = document.getElementById('director-signature-file');
-      const sigPreview = document.getElementById('signature-preview');
-      const sigPreviewImg = document.getElementById('signature-preview-img');
-      const sigPathInput = document.getElementById('office-director-signature-path');
-      const sigUploadLabel = document.getElementById('signature-upload-label');
-      const removeSigBtn = document.getElementById('remove-signature-btn');
+    function setupSignatureUploader({ fileInputId, previewId, previewImgId, uploadLabelId, removeBtnId, targetInputId }) {
+      const fileInput = document.getElementById(fileInputId);
+      const preview = document.getElementById(previewId);
+      const previewImg = document.getElementById(previewImgId);
+      const uploadLabel = document.getElementById(uploadLabelId);
+      const removeBtn = document.getElementById(removeBtnId);
+      const targetInput = document.getElementById(targetInputId);
 
-      sigFileInput?.addEventListener('change', async (e) => {
+      fileInput?.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
         // Show local preview immediately
         const reader = new FileReader();
         reader.onload = (ev) => {
-          if (sigPreviewImg) sigPreviewImg.src = ev.target.result;
-          if (sigPreview) sigPreview.style.display = 'flex';
-          if (sigUploadLabel) sigUploadLabel.style.display = 'none';
+          if (previewImg) previewImg.src = ev.target.result;
+          if (preview) preview.style.display = 'flex';
+          if (uploadLabel) uploadLabel.style.display = 'none';
         };
         reader.readAsDataURL(file);
 
@@ -476,22 +508,52 @@ document.addEventListener('DOMContentLoaded', () => {
             body: fd
           });
           const data = await res.json();
-          if (data.success && sigPathInput) {
-            sigPathInput.value = data.signaturePath;
+          if (data.success && targetInput) {
+            targetInput.value = data.signaturePath;
           }
         } catch (err) {
           console.error('Signature upload error:', err);
         }
       });
 
-      removeSigBtn?.addEventListener('click', () => {
-        if (sigPreview) sigPreview.style.display = 'none';
-        if (sigUploadLabel) sigUploadLabel.style.display = 'flex';
-        if (sigPathInput) sigPathInput.value = '';
-        if (sigPreviewImg) sigPreviewImg.src = '';
-        if (sigFileInput) sigFileInput.value = '';
+      removeBtn?.addEventListener('click', () => {
+        if (preview) preview.style.display = 'none';
+        if (uploadLabel) uploadLabel.style.display = 'flex';
+        if (targetInput) targetInput.value = '';
+        if (previewImg) previewImg.src = '';
+        if (fileInput) fileInput.value = '';
       });
     }
+
+    // Director signature uploader (available for all users)
+    setupSignatureUploader({
+      fileInputId: 'director-signature-file',
+      previewId: 'signature-preview',
+      previewImgId: 'signature-preview-img',
+      uploadLabelId: 'signature-upload-label',
+      removeBtnId: 'remove-signature-btn',
+      targetInputId: 'office-director-signature-path'
+    });
+
+    // Applicant signature uploader (available for all users)
+    setupSignatureUploader({
+      fileInputId: 'person-signature-file',
+      previewId: 'person-signature-preview',
+      previewImgId: 'person-signature-preview-img',
+      uploadLabelId: 'person-signature-upload-label',
+      removeBtnId: 'remove-person-signature-btn',
+      targetInputId: 'person-signature-input'
+    });
+
+    // Responsible person signature uploader (available for all users)
+    setupSignatureUploader({
+      fileInputId: 'resp-signature-file',
+      previewId: 'resp-signature-preview',
+      previewImgId: 'resp-signature-preview-img',
+      uploadLabelId: 'resp-signature-upload-label',
+      removeBtnId: 'remove-resp-signature-btn',
+      targetInputId: 'resp-signature-input'
+    });
 
     // Form submit
     form.addEventListener('submit', async (e) => {
@@ -552,6 +614,12 @@ document.addEventListener('DOMContentLoaded', () => {
       formData.forEach((val, key) => { if (!key.startsWith('child_')) payload[key] = val; });
       payload.rules_read_acknowledgement = rulesCheckbox.checked;
 
+      // Fallback for director signature if photo not uploaded but name typed
+      if (!payload.office_director_signature) {
+        const typedDirector = form.elements['office_director_signature_text']?.value?.trim();
+        if (typedDirector) payload.office_director_signature = typedDirector;
+      }
+
       const childrenData = [];
       for (let i = 1; i <= childRowCount; i++) {
         childrenData.push({ row: i, child_name: form.elements[`child_${i}_name`]?.value || '', age: form.elements[`child_${i}_age`]?.value || '', occupation: form.elements[`child_${i}_occupation`]?.value || '', annual_income: form.elements[`child_${i}_income`]?.value || '', contact: form.elements[`child_${i}_contact`]?.value || '' });
@@ -578,7 +646,16 @@ document.addEventListener('DOMContentLoaded', () => {
           resultBox.textContent = data.message;
           resultBox.className = 'result-box success';
           form.reset();
-          form.elements['application_date'].value = today;
+          if (form.elements['application_date']) form.elements['application_date'].value = today;
+          if (form.elements['office_admission_date']) form.elements['office_admission_date'].value = today;
+          ['signature-preview', 'person-signature-preview', 'resp-signature-preview'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+          });
+          ['signature-upload-label', 'person-signature-upload-label', 'resp-signature-upload-label'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'flex';
+          });
         } else {
           resultBox.textContent = data.message || 'Submission failed.';
           resultBox.className = 'result-box error';
@@ -1068,18 +1145,21 @@ document.addEventListener('DOMContentLoaded', () => {
       { section: '7. Office Use / નિયામકશ્રીની મંજૂરી' },
       { l: 'Admission Date / દાખલ તારીખ', v: item.office_admission_date || 'Pending' },
       { l: 'Monthly Charge / માસિક ચાર્જ', v: item.office_monthly_charge ? `₹${item.office_monthly_charge}` : 'Pending' },
-      { l: 'Director Signature / સહી', v: item.office_director_signature ? '__SIGNATURE_IMAGE__' : 'Pending', isSignature: true, signaturePath: item.office_director_signature },
+      { l: 'Director Signature / સહી', v: item.office_director_signature || 'Pending', isSignature: true, signaturePath: item.office_director_signature },
 
       { section: 'Submission Information / સબમિશન માહિતી' },
       { l: 'Submitted By / દ્વારા', v: item.submittedBy }, { l: 'Submitted At / સમય', v: new Date(item.submittedAt).toLocaleString('en-IN') },
     ];
 
+    const isImg = (val) => typeof val === 'string' && (val.startsWith('/uploads/') || val.startsWith('data:image/'));
+
     let html = '<div class="detail-grid">';
     fields.forEach(f => {
       if (f.section) { html += `<div class="detail-section-title">${f.section}</div>`; return; }
-      if (f.isSignature && f.signaturePath) {
-        const imgUrl = window.getAssetUrl ? window.getAssetUrl(f.signaturePath) : f.signaturePath;
-        html += `<div class="detail-item detail-full"><div class="detail-label">${f.l}</div><div class="detail-value"><img src="${imgUrl}" alt="Director Signature" style="max-width:200px;max-height:100px;border:1px solid var(--color-hairline);border-radius:6px;padding:4px;background:#fff;"></div></div>`;
+      if ((f.isSignature && f.signaturePath && isImg(f.signaturePath)) || isImg(f.v)) {
+        const path = (f.isSignature && isImg(f.signaturePath)) ? f.signaturePath : f.v;
+        const imgUrl = window.getAssetUrl ? window.getAssetUrl(path) : path;
+        html += `<div class="detail-item detail-full"><div class="detail-label">${f.l}</div><div class="detail-value"><img src="${imgUrl}" alt="Signature" style="max-width:200px;max-height:100px;border:1px solid var(--color-hairline);border-radius:6px;padding:4px;background:#fff;object-fit:contain;"></div></div>`;
         return;
       }
       html += `<div class="detail-item${f.full ? ' detail-full' : ''}"><div class="detail-label">${f.l}</div><div class="detail-value">${f.v || '—'}</div></div>`;
@@ -1107,109 +1187,106 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Admin: add editable office-use section
-    if (userRole === 'admin') {
-      html += `<div class="detail-section-title" style="margin-top:16px;">✏️ Edit Office Use Fields (Admin) / ઓફિસ ઉપયોગ સુધારો</div>`;
-      html += `<div class="detail-full" style="padding:16px;background:var(--color-primary-soft);border-radius:10px;margin-bottom:12px;">`;
-      html += `<div class="form-row-3" style="gap:12px;">`;
-      html += `<div class="form-group"><label>Admission Date</label><input type="date" id="modal-office-date" class="text-input" value="${item.office_admission_date || ''}"></div>`;
-      html += `<div class="form-group"><label>Monthly Charge (₹)</label><input type="number" id="modal-office-charge" class="text-input" value="${item.office_monthly_charge || ''}" min="0" placeholder="Enter amount"></div>`;
-      html += `<div class="form-group"><label>Director Signature</label>`;
-      html += `<div class="signature-upload-area">`;
-      if (item.office_director_signature) {
-        const sigUrl = window.getAssetUrl ? window.getAssetUrl(item.office_director_signature) : item.office_director_signature;
-        html += `<div class="signature-preview" id="modal-sig-preview" style="display:flex;"><img id="modal-sig-img" src="${sigUrl}" alt="Signature"><button type="button" class="signature-remove-btn" id="modal-remove-sig" title="Remove">&times;</button></div>`;
-        html += `<label class="signature-upload-btn" id="modal-sig-upload-label" style="display:none;">`;
-      } else {
-        html += `<div class="signature-preview" id="modal-sig-preview" style="display:none;"><img id="modal-sig-img" src="" alt="Signature"><button type="button" class="signature-remove-btn" id="modal-remove-sig" title="Remove">&times;</button></div>`;
-        html += `<label class="signature-upload-btn" id="modal-sig-upload-label">`;
-      }
-      html += `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`;
-      html += `Upload Signature<input type="file" id="modal-sig-file" accept="image/*" style="display:none;"></label>`;
-      html += `<input type="hidden" id="modal-sig-path" value="${item.office_director_signature || ''}">`;
-      html += `</div></div></div>`;
-      html += `<button id="modal-save-office" class="button-primary" style="margin-top:12px;width:100%;">💾 Save Office Use Fields / ઓફિસ વિગત સેવ કરો</button>`;
-      html += `<div id="modal-office-msg" class="settings-msg" style="margin-top:8px;"></div>`;
-      html += `</div>`;
+    // Editable office-use section (available for all users)
+    html += `<div class="detail-section-title" style="margin-top:16px;">✏️ Edit Office Use Fields / ઓફિસ ઉપયોગ વિગત સુધારો</div>`;
+    html += `<div class="detail-full" style="padding:16px;background:var(--color-primary-soft);border-radius:10px;margin-bottom:12px;">`;
+    html += `<div class="form-row-3" style="gap:12px;">`;
+    html += `<div class="form-group"><label>Admission Date</label><input type="date" id="modal-office-date" class="text-input" value="${item.office_admission_date || ''}"></div>`;
+    html += `<div class="form-group"><label>Monthly Charge (₹)</label><input type="number" id="modal-office-charge" class="text-input" value="${item.office_monthly_charge || ''}" min="0" placeholder="Enter amount"></div>`;
+    html += `<div class="form-group"><label>Director Signature</label>`;
+    html += `<div class="signature-upload-area">`;
+    const hasPhotoSig = isImg(item.office_director_signature);
+    if (hasPhotoSig) {
+      const sigUrl = window.getAssetUrl ? window.getAssetUrl(item.office_director_signature) : item.office_director_signature;
+      html += `<div class="signature-preview" id="modal-sig-preview" style="display:flex;"><img id="modal-sig-img" src="${sigUrl}" alt="Signature"><button type="button" class="signature-remove-btn" id="modal-remove-sig" title="Remove">&times;</button></div>`;
+      html += `<label class="signature-upload-btn" id="modal-sig-upload-label" style="display:none;">`;
+    } else {
+      html += `<div class="signature-preview" id="modal-sig-preview" style="display:none;"><img id="modal-sig-img" src="" alt="Signature"><button type="button" class="signature-remove-btn" id="modal-remove-sig" title="Remove">&times;</button></div>`;
+      html += `<label class="signature-upload-btn" id="modal-sig-upload-label">`;
     }
+    html += `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`;
+    html += `Upload Signature<input type="file" id="modal-sig-file" accept="image/*" style="display:none;"></label>`;
+    html += `<input type="hidden" id="modal-sig-path" value="${hasPhotoSig ? item.office_director_signature : ''}">`;
+    html += `<input type="text" id="modal-sig-text" class="text-input" placeholder="Or type director name" value="${!hasPhotoSig && item.office_director_signature ? item.office_director_signature : ''}" style="margin-top:6px;">`;
+    html += `</div></div></div>`;
+    html += `<button id="modal-save-office" class="button-primary" style="margin-top:12px;width:100%;">💾 Save Office Use Fields / ઓફિસ વિગત સેવ કરો</button>`;
+    html += `<div id="modal-office-msg" class="settings-msg" style="margin-top:8px;"></div>`;
+    html += `</div>`;
 
     html += '</div>';
     modalBody.innerHTML = html;
     modal.style.display = 'flex';
 
-    // Setup admin office-use edit handlers
-    if (userRole === 'admin') {
-      // Signature upload in modal
-      const modalSigFile = document.getElementById('modal-sig-file');
-      const modalSigPreview = document.getElementById('modal-sig-preview');
-      const modalSigImg = document.getElementById('modal-sig-img');
-      const modalSigPath = document.getElementById('modal-sig-path');
-      const modalSigUploadLabel = document.getElementById('modal-sig-upload-label');
-      const modalRemoveSig = document.getElementById('modal-remove-sig');
+    // Setup office-use edit handlers (available for all users)
+    const modalSigFile = document.getElementById('modal-sig-file');
+    const modalSigPreview = document.getElementById('modal-sig-preview');
+    const modalSigImg = document.getElementById('modal-sig-img');
+    const modalSigPath = document.getElementById('modal-sig-path');
+    const modalSigUploadLabel = document.getElementById('modal-sig-upload-label');
+    const modalRemoveSig = document.getElementById('modal-remove-sig');
 
-      modalSigFile?.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          if (modalSigImg) modalSigImg.src = ev.target.result;
-          if (modalSigPreview) modalSigPreview.style.display = 'flex';
-          if (modalSigUploadLabel) modalSigUploadLabel.style.display = 'none';
-        };
-        reader.readAsDataURL(file);
+    modalSigFile?.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (modalSigImg) modalSigImg.src = ev.target.result;
+        if (modalSigPreview) modalSigPreview.style.display = 'flex';
+        if (modalSigUploadLabel) modalSigUploadLabel.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
 
-        const fd = new FormData();
-        fd.append('signature', file);
-        try {
-          const sigUrl = window.getApiUrl ? window.getApiUrl('/api/upload-signature') : '/api/upload-signature';
-          const res = await fetch(sigUrl, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: fd });
-          const data = await res.json();
-          if (data.success && modalSigPath) modalSigPath.value = data.signaturePath;
-        } catch (err) { console.error('Signature upload error:', err); }
-      });
+      const fd = new FormData();
+      fd.append('signature', file);
+      try {
+        const sigUrl = window.getApiUrl ? window.getApiUrl('/api/upload-signature') : '/api/upload-signature';
+        const res = await fetch(sigUrl, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: fd });
+        const data = await res.json();
+        if (data.success && modalSigPath) modalSigPath.value = data.signaturePath;
+      } catch (err) { console.error('Signature upload error:', err); }
+    });
 
-      modalRemoveSig?.addEventListener('click', () => {
-        if (modalSigPreview) modalSigPreview.style.display = 'none';
-        if (modalSigUploadLabel) modalSigUploadLabel.style.display = 'flex';
-        if (modalSigPath) modalSigPath.value = '';
-        if (modalSigImg) modalSigImg.src = '';
-      });
+    modalRemoveSig?.addEventListener('click', () => {
+      if (modalSigPreview) modalSigPreview.style.display = 'none';
+      if (modalSigUploadLabel) modalSigUploadLabel.style.display = 'flex';
+      if (modalSigPath) modalSigPath.value = '';
+      if (modalSigImg) modalSigImg.src = '';
+    });
 
-      // Save button
-      document.getElementById('modal-save-office')?.addEventListener('click', async () => {
-        const msgEl = document.getElementById('modal-office-msg');
-        const dateVal = document.getElementById('modal-office-date')?.value || '';
-        const chargeVal = document.getElementById('modal-office-charge')?.value || '';
-        const sigVal = document.getElementById('modal-sig-path')?.value || '';
+    // Save button
+    document.getElementById('modal-save-office')?.addEventListener('click', async () => {
+      const msgEl = document.getElementById('modal-office-msg');
+      const dateVal = document.getElementById('modal-office-date')?.value || '';
+      const chargeVal = document.getElementById('modal-office-charge')?.value || '';
+      const sigVal = document.getElementById('modal-sig-path')?.value || document.getElementById('modal-sig-text')?.value || '';
 
-        try {
-          const res = await API(`/api/submissions/${encodeURIComponent(item.id)}/office`, {
-            method: 'PUT',
-            body: JSON.stringify({
-              office_admission_date: dateVal,
-              office_monthly_charge: chargeVal,
-              office_director_signature: sigVal
-            })
-          });
-          const data = await res.json();
-          if (data.success) {
-            msgEl.textContent = '✅ Saved successfully!';
-            msgEl.className = 'settings-msg success';
-            // Update local data
-            item.office_admission_date = dateVal;
-            item.office_monthly_charge = chargeVal;
-            item.office_director_signature = sigVal;
-          } else {
-            msgEl.textContent = data.message || 'Failed to save.';
-            msgEl.className = 'settings-msg error';
-          }
-        } catch (err) {
-          msgEl.textContent = 'Connection error.';
+      try {
+        const res = await API(`/api/submissions/${encodeURIComponent(item.id)}/office`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            office_admission_date: dateVal,
+            office_monthly_charge: chargeVal,
+            office_director_signature: sigVal
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          msgEl.textContent = '✅ Saved successfully! / સફળતાપૂર્વક સેવ થયું!';
+          msgEl.className = 'settings-msg success';
+          // Update local data
+          item.office_admission_date = dateVal;
+          item.office_monthly_charge = chargeVal;
+          item.office_director_signature = sigVal;
+        } else {
+          msgEl.textContent = data.message || 'Failed to save.';
           msgEl.className = 'settings-msg error';
         }
-        setTimeout(() => { if (msgEl) msgEl.className = 'settings-msg'; }, 3000);
-      });
-    }
+      } catch (err) {
+        msgEl.textContent = 'Connection error.';
+        msgEl.className = 'settings-msg error';
+      }
+      setTimeout(() => { if (msgEl) msgEl.className = 'settings-msg'; }, 3000);
+    });
   }
 
   function showDonationDetailModal(item) {
@@ -1548,7 +1625,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const decLines = doc.splitTextToSize(decText, pw - 8);
       doc.text(decLines, margin + 4, y + 8);
       y += 36;
-      addFieldRow('Responsible Person Signature', item.responsible_person_signature || item.responsible_person_name, 'Date', item.responsible_date || '-');
+      const respSigText = (typeof item.responsible_person_signature === 'string' && (item.responsible_person_signature.startsWith('/uploads/') || item.responsible_person_signature.startsWith('data:image/'))) ? '[Signature Photo Uploaded]' : (item.responsible_person_signature || item.responsible_person_name);
+      addFieldRow('Responsible Person Signature', respSigText, 'Date', item.responsible_date || '-');
 
       addSection('6. Ashram Rules & Regulations');
       if (y > 230) { doc.addPage(); y = 15; }
@@ -1578,7 +1656,8 @@ document.addEventListener('DOMContentLoaded', () => {
       rulesSummary.slice(7).forEach(r => { doc.text(r, margin + pw / 2 + 2, ry2); ry2 += 3.8; });
       y += 44;
 
-      addFieldRow('Rules Acknowledgement', item.rules_read_acknowledgement ? 'Accepted & Agreed' : 'Yes', 'Acknowledged By / Signature', item.person_signature || item.full_name);
+      const ackSigText = (typeof item.person_signature === 'string' && (item.person_signature.startsWith('/uploads/') || item.person_signature.startsWith('data:image/'))) ? '[Signature Photo Uploaded]' : (item.person_signature || item.full_name);
+      addFieldRow('Rules Acknowledgement', item.rules_read_acknowledgement ? 'Accepted & Agreed' : 'Yes', 'Acknowledged By / Signature', ackSigText);
       addField('Acknowledgement Date', item.ack_date || '-');
 
       addSection('7. For Office Use — Director\'s Approval & Signature');
@@ -1589,7 +1668,8 @@ document.addEventListener('DOMContentLoaded', () => {
       doc.text(`Shri/Smt. ${item.full_name || '____________________'} is admitted from Date: ${item.office_admission_date || '________________'}`, margin + 4, y + 4);
       doc.text(`Monthly charge Rs. ${item.office_monthly_charge || '________'}/- guaranteed by Shri: ${item.responsible_person_name || '____________________'}`, margin + 4, y + 10);
       if (item.office_director_signature) {
-        doc.text('Director / Trustee Signature: [Signature Uploaded — See Attached]', margin + 4, y + 16);
+        const isSigImg = typeof item.office_director_signature === 'string' && (item.office_director_signature.startsWith('/uploads/') || item.office_director_signature.startsWith('data:image/'));
+        doc.text(`Director / Trustee Signature: ${isSigImg ? '[Signature Photo Uploaded]' : item.office_director_signature}`, margin + 4, y + 16);
       } else {
         doc.text('Director / Trustee Signature: _______________________      Date: ____________', margin + 4, y + 16);
       }

@@ -295,8 +295,11 @@ app.post('/api/submit', authenticateToken, requireRole('servant', 'admin'), (req
       submittedAt: submittedAt
     };
 
-    db.prepare('INSERT INTO submissions (id, applicationNumber, data, submittedBy, submittedAt) VALUES (?, ?, ?, ?, ?)').run(
-      submissionId, count, JSON.stringify(submissionData), req.user.username, submittedAt
+    db.prepare('INSERT INTO submissions (id, applicationNumber, data, submittedBy, submittedAt, office_admission_date, office_monthly_charge, office_director_signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').run(
+      submissionId, count, JSON.stringify(submissionData), req.user.username, submittedAt,
+      formData.office_admission_date || '',
+      formData.office_monthly_charge || '',
+      formData.office_director_signature || ''
     );
 
     return res.json({ success: true, message: 'Admission form submitted successfully! / પ્રવેશ અરજી સફળતાપૂર્વક સબમિટ થઈ!', id: submissionId, applicationNumber: count });
@@ -325,9 +328,9 @@ app.get('/api/submissions', authenticateToken, (req, res) => {
 });
 
 // ============================================================
-// OFFICE USE UPDATE (Admin only)
+// OFFICE USE UPDATE (Servant & Admin)
 // ============================================================
-app.put('/api/submissions/:id/office', authenticateToken, requireRole('admin'), (req, res) => {
+app.put('/api/submissions/:id/office', authenticateToken, (req, res) => {
   try {
     const { id } = req.params;
     const { office_admission_date, office_monthly_charge, office_director_signature } = req.body;
@@ -355,9 +358,9 @@ app.put('/api/submissions/:id/office', authenticateToken, requireRole('admin'), 
 });
 
 // ============================================================
-// SIGNATURE UPLOAD (Admin only)
+// SIGNATURE UPLOAD (Any authenticated user)
 // ============================================================
-app.post('/api/upload-signature', authenticateToken, requireRole('admin'), (req, res, next) => {
+app.post('/api/upload-signature', authenticateToken, (req, res, next) => {
   uploadSignature.single('signature')(req, res, (err) => {
     if (err) return res.status(400).json({ success: false, message: err.message });
     if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded.' });
@@ -373,7 +376,7 @@ app.post('/api/upload-signature', authenticateToken, requireRole('admin'), (req,
 // ============================================================
 // DONATION RECEIPT ROUTES
 // ============================================================
-app.post('/api/donation', authenticateToken, requireRole('servant'), (req, res) => {
+app.post('/api/donation', authenticateToken, requireRole('servant', 'admin'), (req, res) => {
   try {
     const data = req.body;
     const requiredFields = [
