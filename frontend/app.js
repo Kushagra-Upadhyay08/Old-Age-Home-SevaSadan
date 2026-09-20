@@ -379,7 +379,21 @@ document.addEventListener('DOMContentLoaded', () => {
           <!-- Section 7: For Office Use - Director's Approval -->
           <div class="form-card">
             <div class="card-header bg-dark"><h2><span class="display-lang-en">For Office Use — Director's Approval & Signature</span><span class="display-lang-gu" style="display:none;">આશ્રમના નિયામકશ્રીની મંજૂરી તથા સહી</span></h2></div>
-            <p class="section-desc" style="margin-bottom:12px;"><span class="display-lang-en">Shri ___ is admitted to the ashram from date ___. Monthly charge Rs. ___ is guaranteed by Shri ___.</span><span class="display-lang-gu" style="display:none;">શ્રી ___ ને આશ્રમ તા. ___ થી દાખલ કરવામાં આવે છે. માસિક રૂ. ___ ચાર્જ આપવા શ્રી ___ એ બાંયધરી આપી છે.</span></p>
+            <p class="section-desc" style="margin-bottom:14px;line-height:1.9;padding:10px 14px;background:var(--color-primary-soft);border-radius:8px;border-left:3px solid var(--color-primary);">
+              <span class="display-lang-en">
+                Shri <strong id="office-summary-name-en" style="color:var(--color-primary);border-bottom:1.5px dashed var(--color-primary);padding:0 4px;">___</strong>
+                is admitted to the ashram from date <strong id="office-summary-date-en" style="color:var(--color-primary);border-bottom:1.5px dashed var(--color-primary);padding:0 4px;">${today}</strong>.
+                Monthly charge Rs. <strong id="office-summary-charge-en" style="color:var(--color-primary);border-bottom:1.5px dashed var(--color-primary);padding:0 4px;">___</strong>
+                is guaranteed by Shri <strong id="office-summary-resp-en" style="color:var(--color-primary);border-bottom:1.5px dashed var(--color-primary);padding:0 4px;">___</strong>.
+              </span>
+              <span class="display-lang-gu" style="display:none;">
+                શ્રી <strong id="office-summary-name-gu" style="color:var(--color-primary);border-bottom:1.5px dashed var(--color-primary);padding:0 4px;">___</strong>
+                ને આશ્રમ તા. <strong id="office-summary-date-gu" style="color:var(--color-primary);border-bottom:1.5px dashed var(--color-primary);padding:0 4px;">${today}</strong>
+                થી દાખલ કરવામાં આવે છે. માસિક રૂ. <strong id="office-summary-charge-gu" style="color:var(--color-primary);border-bottom:1.5px dashed var(--color-primary);padding:0 4px;">___</strong>
+                ચાર્જ આપવા શ્રી <strong id="office-summary-resp-gu" style="color:var(--color-primary);border-bottom:1.5px dashed var(--color-primary);padding:0 4px;">___</strong>
+                એ બાંયધરી આપી છે.
+              </span>
+            </p>
             <div class="form-row-3">
               <div class="form-group">
                 <label><span class="display-lang-en">Admission Date</span><span class="display-lang-gu" style="display:none;">દાખલ કરવાની તારીખ</span></label>
@@ -438,8 +452,42 @@ document.addEventListener('DOMContentLoaded', () => {
       if (decNameGu) decNameGu.textContent = n;
       if (decRelGu) decRelGu.textContent = r;
     }
-    nameInput?.addEventListener('input', updateDeclaration);
+
+    // Dynamic office approval text
+    function updateOfficeSummary() {
+      const applicantName = form.elements['full_name']?.value.trim() || '___';
+      const admDate = form.elements['office_admission_date']?.value.trim() || '___';
+      const charge = form.elements['office_monthly_charge']?.value.trim() || '___';
+      const respName = form.elements['responsible_person_name']?.value.trim() || '___';
+
+      const sNameEn = document.getElementById('office-summary-name-en');
+      const sDateEn = document.getElementById('office-summary-date-en');
+      const sChargeEn = document.getElementById('office-summary-charge-en');
+      const sRespEn = document.getElementById('office-summary-resp-en');
+
+      const sNameGu = document.getElementById('office-summary-name-gu');
+      const sDateGu = document.getElementById('office-summary-date-gu');
+      const sChargeGu = document.getElementById('office-summary-charge-gu');
+      const sRespGu = document.getElementById('office-summary-resp-gu');
+
+      if (sNameEn) sNameEn.textContent = applicantName;
+      if (sDateEn) sDateEn.textContent = admDate;
+      if (sChargeEn) sChargeEn.textContent = charge;
+      if (sRespEn) sRespEn.textContent = respName;
+
+      if (sNameGu) sNameGu.textContent = applicantName;
+      if (sDateGu) sDateGu.textContent = admDate;
+      if (sChargeGu) sChargeGu.textContent = charge;
+      if (sRespGu) sRespGu.textContent = respName;
+    }
+
+    nameInput?.addEventListener('input', () => { updateDeclaration(); updateOfficeSummary(); });
     relInput?.addEventListener('input', updateDeclaration);
+    form.elements['office_admission_date']?.addEventListener('input', updateOfficeSummary);
+    form.elements['office_admission_date']?.addEventListener('change', updateOfficeSummary);
+    form.elements['office_monthly_charge']?.addEventListener('input', updateOfficeSummary);
+    form.elements['responsible_person_name']?.addEventListener('input', updateOfficeSummary);
+    updateOfficeSummary();
 
     // Add child row button
     document.getElementById('add-child-row-btn')?.addEventListener('click', () => {
@@ -656,12 +704,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const el = document.getElementById(id);
             if (el) el.style.display = 'flex';
           });
+          updateOfficeSummary();
+          updateDeclaration();
         } else {
           resultBox.textContent = data.message || 'Submission failed.';
           resultBox.className = 'result-box error';
+          if (res.status === 401 || res.status === 403) {
+            resultBox.textContent += ' (Session may be expired, please log out and log in again)';
+          }
         }
       } catch (err) {
-        resultBox.textContent = currentLang === 'en' ? 'Connection error.' : 'કનેક્શન ભૂલ.';
+        console.error('Submission connection error:', err);
+        const errorDetail = err && err.message ? ` (${err.message})` : '';
+        resultBox.textContent = (currentLang === 'en' ? 'Connection error' : 'કનેક્શન ભૂલ') + errorDetail + '. Please verify backend server is running.';
         resultBox.className = 'result-box error';
       }
       resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1491,49 +1546,92 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF('p', 'mm', 'a4');
-      const W = 210, margin = 15, pw = W - 2 * margin;
-      let y = 15;
+      const W = 210, margin = 14, pw = W - 2 * margin;
+      const colW = (pw - 6) / 2;
+      let y = 14;
 
-      doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+      doc.setFontSize(15); doc.setFont('helvetica', 'bold');
       doc.text('Shantilal Mohanlal Ashaktashram Society', W / 2, y, { align: 'center' });
-      y += 6;
-      doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+      y += 5.5;
+      doc.setFontSize(8.5); doc.setFont('helvetica', 'normal');
       doc.text('Ganesh Tekri, Dakor - 388 225 | Phone: 91-(2696) 244918', W / 2, y, { align: 'center' });
-      y += 8;
-      doc.setDrawColor(204, 120, 92); doc.setLineWidth(0.8);
-      doc.line(margin, y, W - margin, y); y += 6;
-      doc.setFontSize(13); doc.setFont('helvetica', 'bold');
-      doc.text('ADMISSION APPLICATION FORM', W / 2, y, { align: 'center' }); y += 8;
+      y += 7;
+      doc.setDrawColor(204, 120, 92); doc.setLineWidth(0.7);
+      doc.line(margin, y, W - margin, y); y += 5.5;
+      doc.setFontSize(12); doc.setFont('helvetica', 'bold');
+      doc.text('ADMISSION APPLICATION FORM', W / 2, y, { align: 'center' }); y += 7;
 
-      doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5); doc.setFont('helvetica', 'normal');
       doc.text(`Application #: ${item.applicationNumber || '-'}`, margin, y);
       doc.text(`Date: ${item.application_date || new Date(item.submittedAt).toLocaleDateString('en-IN')}`, W - margin, y, { align: 'right' });
-      y += 8;
+      y += 7;
+
+      function ensureSpace(heightNeeded) {
+        if (y + heightNeeded > 275) {
+          doc.addPage();
+          y = 14;
+          return true;
+        }
+        return false;
+      }
 
       function addSection(title) {
-        if (y > 270) { doc.addPage(); y = 15; }
-        doc.setFillColor(245, 240, 232); doc.rect(margin, y - 4, pw, 8, 'F');
-        doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(20, 20, 19);
-        doc.text(title, margin + 3, y + 1); y += 10;
-        doc.setTextColor(61, 61, 58); doc.setFont('helvetica', 'normal');
+        ensureSpace(14);
+        doc.setFillColor(245, 240, 232);
+        doc.roundedRect(margin, y - 3.5, pw, 7, 1, 1, 'F');
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(20, 20, 19);
+        doc.text(title, margin + 3, y + 1);
+        y += 8;
+        doc.setTextColor(61, 61, 58);
+        doc.setFont('helvetica', 'normal');
       }
 
       function addField(label, value) {
-        if (y > 275) { doc.addPage(); y = 15; }
-        doc.setFontSize(8); doc.setTextColor(108, 106, 100); doc.text(label, margin, y); y += 4;
-        doc.setFontSize(10); doc.setTextColor(20, 20, 19);
-        const lines = doc.splitTextToSize(String(value || '—'), pw);
-        doc.text(lines, margin, y); y += lines.length * 4.5 + 3;
+        doc.setFontSize(8.5);
+        const valLines = doc.splitTextToSize(String(value || '—'), pw - 4);
+        const fieldH = 3.5 + valLines.length * 4 + 2;
+        ensureSpace(fieldH);
+        doc.setFontSize(7.5);
+        doc.setTextColor(108, 106, 100);
+        doc.setFont('helvetica', 'normal');
+        doc.text(label, margin, y);
+        y += 3.5;
+        doc.setFontSize(8.5);
+        doc.setTextColor(20, 20, 19);
+        doc.text(valLines, margin, y);
+        y += valLines.length * 4 + 1.5;
       }
 
       function addFieldRow(l1, v1, l2, v2) {
-        if (y > 270) { doc.addPage(); y = 15; }
-        const savedY = y;
-        doc.setFontSize(8); doc.setTextColor(108, 106, 100); doc.text(l1, margin, y);
-        doc.setFontSize(10); doc.setTextColor(20, 20, 19); doc.text(String(v1 || '—'), margin, y + 4);
-        doc.setFontSize(8); doc.setTextColor(108, 106, 100); doc.text(l2, margin + pw / 2 + 2, savedY);
-        doc.setFontSize(10); doc.setTextColor(20, 20, 19); doc.text(String(v2 || '—'), margin + pw / 2 + 2, savedY + 4);
-        y = savedY + 11;
+        doc.setFontSize(8.5);
+        const lines1 = doc.splitTextToSize(String(v1 || '—'), colW);
+        const lines2 = doc.splitTextToSize(String(v2 || '—'), colW);
+        const maxLines = Math.max(lines1.length, lines2.length);
+        const rowH = 3.5 + maxLines * 4 + 2;
+
+        ensureSpace(rowH);
+
+        const rowY = y;
+        // Col 1
+        doc.setFontSize(7.5);
+        doc.setTextColor(108, 106, 100);
+        doc.setFont('helvetica', 'normal');
+        doc.text(l1, margin, rowY);
+        doc.setFontSize(8.5);
+        doc.setTextColor(20, 20, 19);
+        doc.text(lines1, margin, rowY + 3.5);
+
+        // Col 2
+        doc.setFontSize(7.5);
+        doc.setTextColor(108, 106, 100);
+        doc.text(l2, margin + colW + 6, rowY);
+        doc.setFontSize(8.5);
+        doc.setTextColor(20, 20, 19);
+        doc.text(lines2, margin + colW + 6, rowY + 3.5);
+
+        y = rowY + rowH;
       }
 
       addSection('1. Applicant Details');
@@ -1560,34 +1658,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
       addSection('3. Family Situation');
       if (item.children_rows && Array.isArray(item.children_rows) && item.children_rows.some(c => c.child_name)) {
-        if (y > 255) { doc.addPage(); y = 15; }
+        ensureSpace(18);
         doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(80, 80, 80);
         doc.text('Children Details (Son / Daughter):', margin, y); y += 4;
         
         // Table header
         doc.setFillColor(235, 230, 222);
-        doc.rect(margin, y - 3, pw, 6, 'F');
+        doc.rect(margin, y - 3, pw, 5.5, 'F');
         doc.setFontSize(7.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(20, 20, 19);
         doc.text('Name', margin + 2, y + 1);
-        doc.text('Age', margin + 50, y + 1);
-        doc.text('Occupation', margin + 65, y + 1);
-        doc.text('Annual Income', margin + 105, y + 1);
-        doc.text('Residence / Contact', margin + 140, y + 1);
-        y += 6;
+        doc.text('Age', margin + 45, y + 1);
+        doc.text('Occupation', margin + 60, y + 1);
+        doc.text('Annual Income', margin + 100, y + 1);
+        doc.text('Residence / Contact', margin + 135, y + 1);
+        y += 5.5;
 
         doc.setFont('helvetica', 'normal');
         item.children_rows.forEach(c => {
           if (c.child_name || c.age || c.occupation) {
-            if (y > 275) { doc.addPage(); y = 15; }
-            doc.setFontSize(8); doc.setTextColor(40, 40, 40);
+            ensureSpace(7);
+            doc.setFontSize(7.5); doc.setTextColor(40, 40, 40);
             doc.text(String(c.child_name || '—'), margin + 2, y);
-            doc.text(String(c.age || '—'), margin + 50, y);
-            doc.text(String(c.occupation || '—'), margin + 65, y);
-            doc.text(String(c.annual_income || '—'), margin + 105, y);
-            doc.text(String(c.contact || '—'), margin + 140, y);
+            doc.text(String(c.age || '—'), margin + 45, y);
+            doc.text(String(c.occupation || '—'), margin + 60, y);
+            doc.text(String(c.annual_income || '—'), margin + 100, y);
+            doc.text(String(c.contact || '—'), margin + 135, y);
             doc.setDrawColor(230, 230, 230); doc.setLineWidth(0.2);
-            doc.line(margin, y + 2, margin + pw, y + 2);
-            y += 6;
+            doc.line(margin, y + 1.5, margin + pw, y + 1.5);
+            y += 5;
           }
         });
         y += 2;
@@ -1615,68 +1713,129 @@ document.addEventListener('DOMContentLoaded', () => {
       addField('Address', item.responsible_person_address);
 
       // Declaration box
-      if (y > 240) { doc.addPage(); y = 15; }
-      doc.setFillColor(250, 248, 244); doc.rect(margin, y - 2, pw, 32, 'F');
-      doc.setDrawColor(204, 120, 92); doc.setLineWidth(0.4); doc.rect(margin, y - 2, pw, 32, 'S');
-      doc.setFontSize(8.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(180, 80, 50);
-      doc.text('DECLARATION / UNDERTAKING BY RESPONSIBLE PERSON', margin + 4, y + 3);
-      doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(40, 40, 40);
       const decText = `The applicant "${item.full_name || 'Applicant'}" is my "${item.responsible_person_relation || 'Relative'}". They wish to enter the ashram of their own free will and have been informed of all ashram policies. I bind myself to take them back whenever notified by the Trustees/Director. In the event of their passing away during their stay at the ashram, if I am unable to be present, I authorize the ashram Trustees to conduct the last rites. I also bind myself to pay the monthly contribution determined by the ashram within the first week of every month.`;
+      doc.setFontSize(7.5);
       const decLines = doc.splitTextToSize(decText, pw - 8);
-      doc.text(decLines, margin + 4, y + 8);
-      y += 36;
+      const decBoxH = 7 + decLines.length * 3.7 + 3;
+      ensureSpace(decBoxH + 14);
+
+      doc.setFillColor(250, 248, 244);
+      doc.roundedRect(margin, y - 2, pw, decBoxH, 1, 1, 'F');
+      doc.setDrawColor(204, 120, 92);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(margin, y - 2, pw, decBoxH, 1, 1, 'S');
+
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(180, 80, 50);
+      doc.text('DECLARATION / UNDERTAKING BY RESPONSIBLE PERSON', margin + 4, y + 2.5);
+
+      doc.setFontSize(7.2);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(40, 40, 40);
+      doc.text(decLines, margin + 4, y + 6.5);
+      y += decBoxH + 3;
+
       const respSigText = (typeof item.responsible_person_signature === 'string' && (item.responsible_person_signature.startsWith('/uploads/') || item.responsible_person_signature.startsWith('data:image/'))) ? '[Signature Photo Uploaded]' : (item.responsible_person_signature || item.responsible_person_name);
-      addFieldRow('Responsible Person Signature', respSigText, 'Date', item.responsible_date || '-');
+      addFieldRow('Responsible Person Signature', respSigText, 'Declaration Date', item.responsible_date || '-');
 
       addSection('6. Ashram Rules & Regulations');
-      if (y > 230) { doc.addPage(); y = 15; }
-      doc.setFillColor(248, 249, 250); doc.rect(margin, y - 2, pw, 40, 'F');
-      doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.3); doc.rect(margin, y - 2, pw, 40, 'S');
-      doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(20, 20, 19);
-      doc.text('Key Ashram Regulations Summary (All 13 Rules Accepted):', margin + 3, y + 3);
-      doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
-      const rulesSummary = [
-        '1. Deposit, admission fee & monthly fee with form + 3 photos of elderly + 1 photo of responsible person.',
+      const rulesList = [
+        '1. Deposit, admission fee & monthly fee required with form + 3 photos of elderly + 1 photo of responsible person.',
         '2. Initial admission is on a temporary basis for 1 month.',
         '3. Monthly maintenance fee payable before the 10th of every month.',
-        '4. No admission for infectious disease, substance addiction, mental instability or severe disorder.',
+        '4. No admission for infectious disease, addiction, mental instability or severe disorder.',
         '5. Punctual attendance for daily prayers, meals and tea required. Permission needed for leaving premises.',
-        '6. Proper care of ashram property mandatory. Unruly behavior or harm will result in immediate discharge.',
-        '7. No personal electric appliances permitted. Avoid water & electricity waste. Maintain cleanliness.',
-        '8. Essentials (bedding, blanket, utensils) provided. Personal medicines and needs arranged by resident.',
+        '6. Proper care of ashram property mandatory. Unruly behavior will result in discharge.',
+        '7. No personal electric appliances permitted. Avoid water & electricity waste.',
+        '8. Essentials (bedding, blanket, utensils) provided by the ashram.',
         '9. Management/Trustee reserves right to ask resident to vacate without assigning reasons.',
         '10. 15 days advance notice required for refund of deposit upon leaving.',
         '11. Ration card & Aadhaar photocopy of applicant and Aadhaar copy of responsible person must be attached.',
         '12. Residents expected to perform assigned light duties sincerely according to capability.',
         '13. Final admission confirmed strictly upon Medical Fitness Certificate from Ashram Doctor.'
       ];
-      let ry = y + 7;
-      rulesSummary.slice(0, 7).forEach(r => { doc.text(r, margin + 3, ry); ry += 3.8; });
-      let ry2 = y + 7;
-      rulesSummary.slice(7).forEach(r => { doc.text(r, margin + pw / 2 + 2, ry2); ry2 += 3.8; });
-      y += 44;
+
+      doc.setFontSize(6.8);
+      doc.setFont('helvetica', 'normal');
+      let leftRules = [];
+      rulesList.slice(0, 7).forEach(r => leftRules.push(...doc.splitTextToSize(r, colW)));
+      let rightRules = [];
+      rulesList.slice(7).forEach(r => rightRules.push(...doc.splitTextToSize(r, colW)));
+
+      const maxRuleLines = Math.max(leftRules.length, rightRules.length);
+      const rulesBoxH = 7 + maxRuleLines * 3.3 + 3;
+      ensureSpace(rulesBoxH + 14);
+
+      doc.setFillColor(248, 249, 250);
+      doc.roundedRect(margin, y - 2, pw, rulesBoxH, 1, 1, 'F');
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(margin, y - 2, pw, rulesBoxH, 1, 1, 'S');
+
+      doc.setFontSize(7.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(20, 20, 19);
+      doc.text('Key Ashram Regulations Summary (All 13 Rules Accepted & Agreed):', margin + 3, y + 2.5);
+
+      doc.setFontSize(6.8);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(60, 60, 60);
+
+      let ryL = y + 6.5;
+      leftRules.forEach(l => { doc.text(l, margin + 3, ryL); ryL += 3.3; });
+      let ryR = y + 6.5;
+      rightRules.forEach(l => { doc.text(l, margin + colW + 6, ryR); ryR += 3.3; });
+      y += rulesBoxH + 4;
 
       const ackSigText = (typeof item.person_signature === 'string' && (item.person_signature.startsWith('/uploads/') || item.person_signature.startsWith('data:image/'))) ? '[Signature Photo Uploaded]' : (item.person_signature || item.full_name);
       addFieldRow('Rules Acknowledgement', item.rules_read_acknowledgement ? 'Accepted & Agreed' : 'Yes', 'Acknowledged By / Signature', ackSigText);
       addField('Acknowledgement Date', item.ack_date || '-');
 
       addSection('7. For Office Use — Director\'s Approval & Signature');
-      if (y > 250) { doc.addPage(); y = 15; }
-      doc.setFillColor(250, 250, 250); doc.rect(margin, y - 2, pw, 20, 'F');
-      doc.setDrawColor(180, 180, 180); doc.setLineWidth(0.3); doc.rect(margin, y - 2, pw, 20, 'S');
-      doc.setFontSize(8); doc.setTextColor(40, 40, 40);
-      doc.text(`Shri/Smt. ${item.full_name || '____________________'} is admitted from Date: ${item.office_admission_date || '________________'}`, margin + 4, y + 4);
-      doc.text(`Monthly charge Rs. ${item.office_monthly_charge || '________'}/- guaranteed by Shri: ${item.responsible_person_name || '____________________'}`, margin + 4, y + 10);
+      const officeText1 = `Shri/Smt. ${item.full_name || '____________________'} is admitted from Date: ${item.office_admission_date || '________________'}`;
+      const officeText2 = `Monthly charge Rs. ${item.office_monthly_charge || '________'}/- guaranteed by Shri: ${item.responsible_person_name || '____________________'}`;
+      let officeSigText = 'Director / Trustee Signature: _______________________      Date: ____________';
       if (item.office_director_signature) {
         const isSigImg = typeof item.office_director_signature === 'string' && (item.office_director_signature.startsWith('/uploads/') || item.office_director_signature.startsWith('data:image/'));
-        doc.text(`Director / Trustee Signature: ${isSigImg ? '[Signature Photo Uploaded]' : item.office_director_signature}`, margin + 4, y + 16);
-      } else {
-        doc.text('Director / Trustee Signature: _______________________      Date: ____________', margin + 4, y + 16);
+        officeSigText = `Director / Trustee Signature: ${isSigImg ? '[Signature Photo Uploaded]' : item.office_director_signature}`;
       }
-      y += 26;
+
+      doc.setFontSize(8);
+      const linesO1 = doc.splitTextToSize(officeText1, pw - 8);
+      const linesO2 = doc.splitTextToSize(officeText2, pw - 8);
+      const linesO3 = doc.splitTextToSize(officeSigText, pw - 8);
+      const officeBoxH = 6 + (linesO1.length + linesO2.length + linesO3.length) * 4.2 + 4;
+
+      ensureSpace(officeBoxH + 14);
+      doc.setFillColor(250, 250, 250);
+      doc.roundedRect(margin, y - 2, pw, officeBoxH, 1, 1, 'F');
+      doc.setDrawColor(180, 180, 180);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(margin, y - 2, pw, officeBoxH, 1, 1, 'S');
+
+      doc.setFontSize(8);
+      doc.setTextColor(30, 30, 30);
+      let oy = y + 3.5;
+      doc.text(linesO1, margin + 4, oy);
+      oy += linesO1.length * 4.2;
+      doc.text(linesO2, margin + 4, oy);
+      oy += linesO2.length * 4.2;
+      doc.text(linesO3, margin + 4, oy);
+      y += officeBoxH + 5;
 
       addSection('Submission Records');
       addFieldRow('Submitted By', item.submittedBy, 'Submitted At', new Date(item.submittedAt).toLocaleString('en-IN'));
+
+      // Page numbers on all pages
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFontSize(7.5);
+        doc.setTextColor(140, 140, 140);
+        doc.text(`Page ${i} of ${totalPages}`, W / 2, 290, { align: 'center' });
+        doc.text('Ashaktashram Dakor — Confidential Document', margin, 290);
+      }
 
       doc.save(`Admission_Form_${item.applicationNumber || 'NA'}.pdf`);
     } catch (err) {
